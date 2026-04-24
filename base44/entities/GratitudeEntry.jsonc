@@ -1,0 +1,30 @@
+{
+  "name": "GratitudeEntry",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "description": "The date of the entry in YYYY-MM-DD format"
+    },
+    "event_1": {
+      "type": "string",
+      "description": "First positive event"
+    },
+    "event_2": {
+      "type": "string",
+      "description": "Second positive event"
+    },
+    "event_3": {
+      "type": "string",
+      "description": "Third positive event"
+    },
+    "is_complete": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether all 3 events have been filled"
+    }
+  },
+  "required": [
+    "date"
+  ]
+}
