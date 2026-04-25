@@ -1,14 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { format, isToday, isYesterday, parseISO } from "date-fns";
-import { fr } from "date-fns/locale";
 import { Star } from "lucide-react";
 
 function formatDayLabel(dateStr) {
   const date = parseISO(dateStr);
-  if (isToday(date)) return "Aujourd'hui";
-  if (isYesterday(date)) return "Hier";
-  return format(date, "EEEE d MMMM", { locale: fr });
+  if (isToday(date)) return "Today";
+  if (isYesterday(date)) return "Yesterday";
+  return format(date, "EEEE, MMMM d");
 }
 
 export default function DayCard({ entry, index }) {
@@ -54,7 +53,7 @@ export default function DayCard({ entry, index }) {
         ))}
         {events.length === 0 && (
           <p className="text-[#B7A08C]/40 text-sm italic">
-            Aucun moment enregistré
+            No moments recorded
           </p>
         )}
       </div>

@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import EventCard from "../components/EventCard";
@@ -62,7 +61,7 @@ export default function Home() {
     saveMutation.mutate({ field, value });
   };
 
-  const formattedDate = format(new Date(), "EEEE d MMMM yyyy", { locale: fr });
+  const formattedDate = format(new Date(), "EEEE, MMMM d yyyy");
 
   return (
     <div className="min-h-screen bg-[#707AD6] pb-28 px-5 pt-14">
@@ -71,13 +70,13 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-10"
       >
-        <p className="text-[#3E47AB] text-sm font-medium uppercase tracking-widest mb-2 font-body">
+        <p className="text-[#1A215B] text-sm font-medium uppercase tracking-widest mb-2 font-body">
           {formattedDate}
         </p>
         <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold leading-tight">
-          Tes 3 moments
+          Your 3 positive
           <br />
-          positifs du jour
+          moments today
         </h1>
       </motion.div>
 
@@ -110,7 +109,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 bg-[#F9EFE4]/20 backdrop-blur-sm rounded-full px-6 py-3">
               <Sparkles className="w-5 h-5 text-[#F9EFE4]" />
               <span className="text-[#F9EFE4] font-medium text-sm font-body">
-                Bravo ! Tu as complété ta journée ✨
+                Well done! You completed your day ✨
               </span>
             </div>
           </motion.div>

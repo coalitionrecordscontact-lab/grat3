@@ -25,16 +25,15 @@ export default function History() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <p className="text-[#3E47AB] text-sm font-medium uppercase tracking-widest mb-2 font-body">
-          Ton parcours
+        <p className="text-[#1A215B] text-sm font-medium uppercase tracking-widest mb-2 font-body">
+          Your journey
         </p>
         <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold">
-          Historique
+          History
         </h1>
         {entries.length > 0 && (
           <p className="text-[#F9EFE4]/60 text-sm mt-2 font-body">
-            {entries.length} jour{entries.length > 1 ? "s" : ""} enregistré
-            {entries.length > 1 ? "s" : ""}
+            {entries.length} day{entries.length > 1 ? "s" : ""} recorded
           </p>
         )}
       </motion.div>
@@ -50,10 +49,7 @@ export default function History() {
           className="text-center py-20"
         >
           <p className="text-[#F9EFE4]/60 text-lg font-body">
-            Aucune entrée pour l'instant
-          </p>
-          <p className="text-[#F9EFE4]/40 text-sm mt-2 font-body">
-            Commence par noter tes moments positifs du jour !
+            No entries yet
           </p>
         </motion.div>
       ) : (

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { format, parseISO } from "date-fns";
-import { fr } from "date-fns/locale";
 
 export default function Community() {
   const [email, setEmail] = useState("");
@@ -26,8 +25,8 @@ export default function Community() {
   const handleInvite = async () => {
     if (!email.trim() || !email.includes("@")) {
       toast({
-        title: "Email invalide",
-        description: "Entre une adresse email valide.",
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
         variant: "destructive",
       });
       return;
@@ -37,14 +36,14 @@ export default function Community() {
     try {
       await base44.users.inviteUser(email.trim(), "user");
       toast({
-        title: "Invitation envoyée ! 🎉",
-        description: `${email} a été invité(e) à rejoindre l'application.`,
+        title: "Invitation sent! 🎉",
+        description: `${email} has been invited to join the app.`,
       });
       setEmail("");
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer l'invitation. Réessaye plus tard.",
+        title: "Error",
+        description: "Could not send the invitation. Please try again later.",
         variant: "destructive",
       });
     }
@@ -66,11 +65,11 @@ export default function Community() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <p className="text-[#3E47AB] text-sm font-medium uppercase tracking-widest mb-2 font-body">
-          Ensemble
+        <p className="text-[#1A215B] text-sm font-medium uppercase tracking-widest mb-2 font-body">
+          Together
         </p>
         <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold">
-          Communauté
+          Community
         </h1>
       </motion.div>
 
@@ -87,10 +86,10 @@ export default function Community() {
           </div>
           <div>
             <h3 className="text-[#B7A08C] font-heading font-semibold text-base">
-              Invite un ami
+              Invite a friend
             </h3>
             <p className="text-[#B7A08C]/60 text-xs font-body">
-              Partagez vos moments positifs ensemble
+              Share your positive moments together
             </p>
           </div>
         </div>
@@ -125,7 +124,7 @@ export default function Community() {
         <div className="flex items-center gap-2 mb-4">
           <Users className="w-4 h-4 text-[#F9EFE4]/60" />
           <h2 className="text-[#F9EFE4]/80 text-sm font-medium font-body uppercase tracking-widest">
-            Fil de la communauté
+            Community feed
           </h2>
         </div>
 
@@ -137,7 +136,7 @@ export default function Community() {
           <div className="text-center py-12">
             <Heart className="w-12 h-12 text-[#F9EFE4]/20 mx-auto mb-4" />
             <p className="text-[#F9EFE4]/60 font-body">
-              Invite tes amis pour voir leurs moments positifs ici !
+              Invite your friends to see their positive moments here!
             </p>
           </div>
         ) : (
@@ -161,7 +160,7 @@ export default function Community() {
                       {userEmail}
                     </p>
                     <p className="text-[#B7A08C]/50 text-xs font-body">
-                      {userEntries.length} jour{userEntries.length > 1 ? "s" : ""}
+                      {userEntries.length} day{userEntries.length > 1 ? "s" : ""}
                     </p>
                   </div>
                 </div>
@@ -172,7 +171,7 @@ export default function Community() {
                   return (
                     <div key={entry.id}>
                       <p className="text-[#B7A08C]/50 text-xs mb-2 font-body">
-                        {format(parseISO(entry.date), "d MMMM yyyy", { locale: fr })}
+                        {format(parseISO(entry.date), "MMMM d, yyyy")}
                       </p>
                       <div className="space-y-2">
                         {events.map((event, i) => (

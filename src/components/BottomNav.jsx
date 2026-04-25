@@ -4,9 +4,9 @@ import { Home, CalendarDays, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
 const tabs = [
-  { path: "/", icon: Home, label: "Aujourd'hui" },
-  { path: "/history", icon: CalendarDays, label: "Historique" },
-  { path: "/community", icon: Users, label: "Communauté" },
+  { path: "/", icon: Home, label: "Today" },
+  { path: "/history", icon: CalendarDays, label: "History" },
+  { path: "/community", icon: Users, label: "Community" },
 ];
 
 export default function BottomNav() {
