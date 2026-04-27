@@ -18,30 +18,30 @@ export default function DayCard({ entry, index }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, duration: 0.4 }}
-      className="bg-[#F9EFE4] rounded-3xl p-6 shadow-md"
-    >
+      className="bg-[#F9EFE4] rounded-3xl p-6 shadow-md">
+      
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-[#B7A08C] font-heading text-lg font-semibold capitalize">
           {formatDayLabel(entry.date)}
         </h3>
         <div className="flex gap-0.5">
-          {[0, 1, 2].map((i) => (
-            <Star
-              key={i}
-              className={`w-4 h-4 ${
-                i < events.length
-                  ? "text-[#707AD6] fill-[#707AD6]"
-                  : "text-[#B7A08C]/20"
-              }`}
-            />
-          ))}
+          {[0, 1, 2].map((i) =>
+          <Star
+            key={i}
+            className={`w-4 h-4 ${
+            i < events.length ?
+            "text-[#707AD6] fill-[#707AD6]" :
+            "text-[#B7A08C]/20"}`
+            } />
+
+          )}
         </div>
       </div>
 
       <div className="space-y-3">
-        {events.map((event, i) => (
-          <div key={i} className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-[#707AD6]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+        {events.map((event, i) =>
+        <div key={i} className="flex items-start gap-3">
+            <div className="bg-[hsl(var(--card-foreground))] mt-0.5 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
               <span className="text-[#707AD6] text-xs font-semibold">
                 {i + 1}
               </span>
@@ -50,13 +50,13 @@ export default function DayCard({ entry, index }) {
               {event}
             </p>
           </div>
-        ))}
-        {events.length === 0 && (
-          <p className="text-[#B7A08C]/40 text-sm italic">
+        )}
+        {events.length === 0 &&
+        <p className="text-[#B7A08C]/40 text-sm italic">
             No moments recorded
           </p>
-        )}
+        }
       </div>
-    </motion.div>
-  );
+    </motion.div>);
+
 }
