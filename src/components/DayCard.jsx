@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { format, isToday, isYesterday, parseISO } from "date-fns";
-
+import { Star } from "lucide-react";
 
 function formatDayLabel(dateStr) {
   const date = parseISO(dateStr);
@@ -24,12 +24,14 @@ export default function DayCard({ entry, index }) {
         <h3 className="text-[#B7A08C] font-heading text-lg font-semibold capitalize">
           {formatDayLabel(entry.date)}
         </h3>
-        <div className="flex gap-1">
+        <div className="flex gap-0.5">
           {[0, 1, 2].map((i) => (
-            <div
+            <Star
               key={i}
-              className={`w-4 h-4 rounded-full ${
-                i < events.length ? "bg-[#707AD6]" : "bg-[#B7A08C]/20"
+              className={`w-4 h-4 ${
+                i < events.length
+                  ? "text-[#707AD6] fill-[#707AD6]"
+                  : "text-[#B7A08C]/20"
               }`}
             />
           ))}
@@ -39,8 +41,8 @@ export default function DayCard({ entry, index }) {
       <div className="space-y-3">
         {events.map((event, i) => (
           <div key={i} className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-[#707AD6] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-[#F9EFE4] text-xs font-semibold">
+            <div className="w-6 h-6 rounded-full bg-[#707AD6]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-[#707AD6] text-xs font-semibold">
                 {i + 1}
               </span>
             </div>
