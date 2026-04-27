@@ -7,6 +7,13 @@
   font-style: italic;
 }
 
+@font-face {
+  font-family: 'PPEditorialNew';
+  src: url('https://base44.app/api/apps/69ebc946938524d44fd026b0/files/mp/public/69ebc946938524d44fd026b0/f265fa4ed_PPEditorialNew-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
