@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, Send, Users, Star, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { motion } from "framer-motion";
+import { Share2, Users, Star, Heart } from "lucide-react";
 import { format, parseISO } from "date-fns";
 
 export default function Community() {
-  const [email, setEmail] = useState("");
-  const [inviting, setInviting] = useState(false);
-  const { toast } = useToast();
+  const APP_URL = window.location.origin;
+  const SHARE_TEXT = "Join me on this gratitude journal app! 🌟";
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      await navigator.share({ title: "Gratitude Journal", text: SHARE_TEXT, url: APP_URL });
+    }
+  };
 
   const { data: communityEntries, isLoading } = useQuery({
     queryKey: ["community-entries"],
@@ -21,34 +23,6 @@ export default function Community() {
     },
     initialData: []
   });
-
-  const handleInvite = async () => {
-    if (!email.trim() || !email.includes("@")) {
-      toast({
-        title: "Invalid email",
-        description: "Please enter a valid email address.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setInviting(true);
-    try {
-      await base44.users.inviteUser(email.trim(), "user");
-      toast({
-        title: "Invitation sent! 🎉",
-        description: `${email} has been invited to join the app.`
-      });
-      setEmail("");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Could not send the invitation. Please try again later.",
-        variant: "destructive"
-      });
-    }
-    setInviting(false);
-  };
 
   // Group entries by user
   const groupedByUser = communityEntries.reduce((acc, entry) => {
@@ -65,7 +39,7 @@ export default function Community() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8">
         
-        <p className="text-[#1A215B] text-sm font-medium uppercase tracking-widest mb-2 font-body">
+        <p className="text-[#8D92D4] text-sm font-medium uppercase tracking-widest mb-2 font-body">
           Together
         </p>
         <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold">
@@ -80,41 +54,27 @@ export default function Community() {
         transition={{ delay: 0.1 }}
         className="bg-[#F9EFE4] rounded-3xl p-6 shadow-md mb-6">
         
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-5">
           <div className="w-10 h-10 rounded-full bg-[#707AD6]/10 flex items-center justify-center">
-            <UserPlus className="w-5 h-5 text-[#707AD6]" />
+            <Share2 className="w-5 h-5 text-[#727AD0]" />
           </div>
           <div>
-            <h3 className="text-[hsl(var(--background))] text-base font-semibold">Invite a friend
-
+            <h3 className="text-[#727AD0] font-heading font-semibold text-base">
+              Invite a friend
             </h3>
-            <p className="text-[#B7A08C]/60 text-xs font-body">
+            <p className="text-[#727AD0]/60 text-xs font-body">
               Share your positive moments together
             </p>
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <Input
-            type="email"
-            placeholder="email@exemple.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="bg-white/50 border-[#B7A08C]/20 text-[#B7A08C] placeholder-[#B7A08C]/30 
-                       rounded-xl focus:ring-[#707AD6]/30 font-body"
-
-            onKeyDown={(e) => e.key === "Enter" && handleInvite()} />
-          
-          <Button
-            onClick={handleInvite}
-            disabled={inviting}
-            className="bg-[#707AD6] hover:bg-[#3E47AB] text-[#F9EFE4] rounded-xl px-4 
-                       transition-all duration-200 shrink-0">
-
-            
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
+        <button
+          onClick={handleNativeShare}
+          className="w-full bg-[#727AD0] text-[#F9EFE4] rounded-2xl py-4 text-sm font-semibold font-body hover:bg-[#1A215B] transition-colors flex items-center justify-center gap-2"
+        >
+          <Share2 className="w-4 h-4" />
+          Share with a friend
+        </button>
       </motion.div>
 
       {/* Community Feed */}
