@@ -42,7 +42,7 @@ export default function DayCard({ entry, index }) {
         {events.map((event, i) =>
         <div key={i} className="flex items-start gap-3">
             <div className="bg-[hsl(var(--card-foreground))] mt-0.5 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
-              <span className="text-[#707AD6] text-xs font-semibold">
+              <span className="text-[hsl(var(--card))] text-xs font-semibold">
                 {i + 1}
               </span>
             </div>
