@@ -19,15 +19,12 @@ export default function History() {
   });
 
   return (
-    <div className="min-h-screen bg-[#707AD6] pb-28 px-5 pt-14">
+    <div className="min-h-screen bg-[#707AD6] pb-28 px-5 pt-10">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8">
         
-        <p className="text-[#8D92D4] text-sm font-medium uppercase tracking-widest mb-2 font-body">
-          Your journey
-        </p>
         <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight">
           History
         </h1>

@@ -64,15 +64,12 @@ export default function Home() {
   const formattedDate = format(new Date(), "EEEE, MMMM d yyyy");
 
   return (
-    <div className="min-h-screen bg-[#707AD6] pb-28 px-5 pt-14">
+    <div className="min-h-screen bg-[#707AD6] pb-28 px-5 pt-10">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-10"
       >
-        <p className="text-[#8D92D4] text-sm font-medium uppercase tracking-widest mb-2 font-body">
-          {formattedDate}
-        </p>
         <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight leading-tight">
           Your 3 positive
           <br />
@@ -109,7 +106,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 bg-[#F9EFE4]/20 backdrop-blur-sm rounded-full px-6 py-3">
               <Sparkles className="w-5 h-5 text-[#F9EFE4]" />
               <span className="text-[#F9EFE4] font-medium text-sm font-body">
-                Well done! You completed your day ✨
+                Well done! You completed your day
               </span>
             </div>
           </motion.div>

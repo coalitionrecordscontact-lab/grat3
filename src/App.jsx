@@ -1,3 +1,4 @@
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -10,9 +11,25 @@ import History from './pages/History';
 import Community from './pages/Community';
 import FontUpload from './pages/FontUpload';
 import AppLayout from './components/AppLayout';
+import UsernameSetup from './components/UsernameSetup';
+import { base44 } from '@/api/base44Client';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const [user, setUser] = React.useState(null);
+  const [checkingUser, setCheckingUser] = React.useState(true);
+  const [needsUsername, setNeedsUsername] = React.useState(false);
+
+  React.useEffect(() => {
+    base44.auth.isAuthenticated().then(async (authed) => {
+      if (authed) {
+        const me = await base44.auth.me();
+        setUser(me);
+        if (!me.username) setNeedsUsername(true);
+      }
+      setCheckingUser(false);
+    });
+  }, []);
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -32,6 +49,10 @@ const AuthenticatedApp = () => {
       navigateToLogin();
       return null;
     }
+  }
+
+  if (needsUsername) {
+    return <UsernameSetup onComplete={(u) => { setNeedsUsername(false); setUser({ ...user, username: u }); }} />;
   }
 
   // Render the main app
