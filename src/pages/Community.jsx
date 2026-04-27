@@ -90,33 +90,7 @@ export default function Community() {
         </motion.div>
       )}
 
-      {/* Invite Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-[#F9EFE4] rounded-3xl p-6 shadow-md mb-6">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-full bg-[#707AD6]/10 flex items-center justify-center">
-            <Share2 className="w-5 h-5 text-[#727AD0]" />
-          </div>
-          <div>
-            <h3 className="text-[#727AD0] font-heading font-semibold text-base">
-              Invite a friend
-            </h3>
-            <p className="text-[#727AD0]/60 text-xs font-body">
-              Share your positive moments together
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={handleNativeShare}
-          className="w-full bg-[#727AD0] text-[#F9EFE4] rounded-2xl py-4 text-sm font-semibold font-body hover:bg-[#1A215B] transition-colors flex items-center justify-center gap-2"
-        >
-          <Share2 className="w-4 h-4" />
-          Share with a friend
-        </button>
-      </motion.div>
+
 
       {/* Community Feed */}
       <motion.div
