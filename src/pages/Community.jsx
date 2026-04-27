@@ -65,7 +65,7 @@ export default function Community() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <p className="text-[#1A215B] text-sm font-medium uppercase tracking-widest mb-2 font-body">
+        <p className="text-stone-300 text-sm font-medium uppercase tracking-widest mb-2 font-body">
           Together
         </p>
         <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold">
@@ -135,8 +135,8 @@ export default function Community() {
         ) : Object.keys(groupedByUser).length === 0 ? (
           <div className="text-center py-12">
             <Heart className="w-12 h-12 text-[#F9EFE4]/20 mx-auto mb-4" />
-            <p className="text-[#F9EFE4]/60 font-body">
-              Invite your friends to see their positive moments here!
+            <p className="text-stone-300 font-body">
+              Invite your friends to share positive moments here!
             </p>
           </div>
         ) : (

@@ -70,7 +70,7 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-10"
       >
-        <p className="text-[#1A215B] text-sm font-medium uppercase tracking-widest mb-2 font-body">
+        <p className="text-stone-300 text-sm font-medium uppercase tracking-widest mb-2 font-body">
           {formattedDate}
         </p>
         <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold leading-tight">
