@@ -2,40 +2,13 @@ import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Share2, Users, Star, Heart, Instagram, Facebook, Mail } from "lucide-react";
+import { Share2, Users, Star, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, parseISO } from "date-fns";
 
 export default function Community() {
   const APP_URL = window.location.origin;
   const SHARE_TEXT = "Join me on this gratitude journal app! 🌟";
-
-  const shareOptions = [
-    {
-      label: "WhatsApp",
-      color: "bg-[#25D366]",
-      url: `https://wa.me/?text=${encodeURIComponent(SHARE_TEXT + " " + APP_URL)}`,
-    },
-    {
-      label: "Facebook",
-      color: "bg-[#1877F2]",
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APP_URL)}`,
-    },
-    {
-      label: "Instagram",
-      color: "bg-gradient-to-br from-[#f09433] via-[#e6683c] via-[#dc2743] via-[#cc2366] to-[#bc1888]",
-      url: `https://www.instagram.com/`,
-    },
-    {
-      label: "Email",
-      color: "bg-[#707AD6]",
-      url: `mailto:?subject=${encodeURIComponent("Join me on this app!")}&body=${encodeURIComponent(SHARE_TEXT + "\n" + APP_URL)}`,
-    },
-  ];
-
-  const handleShare = (url) => {
-    window.open(url, "_blank");
-  };
 
   const handleNativeShare = async () => {
     if (navigator.share) {
@@ -96,26 +69,13 @@ export default function Community() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          {shareOptions.map((opt) => (
-            <button
-              key={opt.label}
-              onClick={() => handleShare(opt.url)}
-              className={`${opt.color} text-white rounded-2xl py-3 px-4 text-sm font-semibold font-body transition-opacity hover:opacity-90 active:opacity-75`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {navigator.share && (
-          <button
-            onClick={handleNativeShare}
-            className="mt-3 w-full bg-[#707AD6]/10 text-[#707AD6] rounded-2xl py-3 text-sm font-semibold font-body hover:bg-[#707AD6]/20 transition-colors"
-          >
-            Share via…
-          </button>
-        )}
+        <button
+          onClick={handleNativeShare}
+          className="w-full bg-[#707AD6] text-[#F9EFE4] rounded-2xl py-4 text-sm font-semibold font-body hover:bg-[#1A215B] transition-colors flex items-center justify-center gap-2"
+        >
+          <Share2 className="w-4 h-4" />
+          Share with a friend
+        </button>
       </motion.div>
 
       {/* Community Feed */}

@@ -22,7 +22,7 @@ export default function EventCard({ index, value, onSave, saved }) {
       transition={{ delay: index * 0.12, duration: 0.4, ease: "easeOut" }}
     >
       <div
-        className={`bg-[#F9EFE4] rounded-2xl px-5 py-4 transition-all duration-300 flex items-center gap-4 ${
+        className={`bg-[#F9EFE4] rounded-2xl px-5 py-5 transition-all duration-300 flex items-center gap-4 ${
           isFocused ? "shadow-xl scale-[1.01]" : "shadow-md"
         } ${saved ? "ring-2 ring-[#707AD6]/20" : ""}`}
       >
@@ -39,7 +39,7 @@ export default function EventCard({ index, value, onSave, saved }) {
           onKeyDown={(e) => e.key === "Enter" && handleSave()}
           readOnly={saved}
           className="flex-1 bg-transparent text-[#B7A08C] placeholder-[#B7A08C]/30 
-                     text-sm font-body outline-none min-w-0"
+                     text-base font-body outline-none min-w-0"
           placeholder={`Positive moment ${index + 1}...`}
         />
 
