@@ -48,7 +48,7 @@ export default function History() {
         animate={{ opacity: 1 }}
         className="text-center py-20">
         
-          <p className="text-[hsl(var(--border))] text-lg font-body">No entries yet
+          <p className="text-stone-300 text-lg font-body">No entries yet
 
         </p>
         </motion.div> :
