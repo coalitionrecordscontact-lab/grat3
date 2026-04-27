@@ -1,17 +1,47 @@
-import React, { useState } from "react";
+import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, Send, Users, Star, Heart } from "lucide-react";
+import { motion } from "framer-motion";
+import { Share2, Users, Star, Heart, Instagram, Facebook, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
 import { format, parseISO } from "date-fns";
 
 export default function Community() {
-  const [email, setEmail] = useState("");
-  const [inviting, setInviting] = useState(false);
-  const { toast } = useToast();
+  const APP_URL = window.location.origin;
+  const SHARE_TEXT = "Join me on this gratitude journal app! 🌟";
+
+  const shareOptions = [
+    {
+      label: "WhatsApp",
+      color: "bg-[#25D366]",
+      url: `https://wa.me/?text=${encodeURIComponent(SHARE_TEXT + " " + APP_URL)}`,
+    },
+    {
+      label: "Facebook",
+      color: "bg-[#1877F2]",
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APP_URL)}`,
+    },
+    {
+      label: "Instagram",
+      color: "bg-gradient-to-br from-[#f09433] via-[#e6683c] via-[#dc2743] via-[#cc2366] to-[#bc1888]",
+      url: `https://www.instagram.com/`,
+    },
+    {
+      label: "Email",
+      color: "bg-[#707AD6]",
+      url: `mailto:?subject=${encodeURIComponent("Join me on this app!")}&body=${encodeURIComponent(SHARE_TEXT + "\n" + APP_URL)}`,
+    },
+  ];
+
+  const handleShare = (url) => {
+    window.open(url, "_blank");
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      await navigator.share({ title: "Gratitude Journal", text: SHARE_TEXT, url: APP_URL });
+    }
+  };
 
   const { data: communityEntries, isLoading } = useQuery({
     queryKey: ["community-entries"],
@@ -21,34 +51,6 @@ export default function Community() {
     },
     initialData: [],
   });
-
-  const handleInvite = async () => {
-    if (!email.trim() || !email.includes("@")) {
-      toast({
-        title: "Invalid email",
-        description: "Please enter a valid email address.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setInviting(true);
-    try {
-      await base44.users.inviteUser(email.trim(), "user");
-      toast({
-        title: "Invitation sent! 🎉",
-        description: `${email} has been invited to join the app.`,
-      });
-      setEmail("");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Could not send the invitation. Please try again later.",
-        variant: "destructive",
-      });
-    }
-    setInviting(false);
-  };
 
   // Group entries by user
   const groupedByUser = communityEntries.reduce((acc, entry) => {
@@ -65,7 +67,7 @@ export default function Community() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <p className="text-stone-300 text-sm font-medium uppercase tracking-widest mb-2 font-body">
+        <p className="text-[#8D92D4] text-sm font-medium uppercase tracking-widest mb-2 font-body">
           Together
         </p>
         <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold">
@@ -80,9 +82,9 @@ export default function Community() {
         transition={{ delay: 0.1 }}
         className="bg-[#F9EFE4] rounded-3xl p-6 shadow-md mb-6"
       >
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-5">
           <div className="w-10 h-10 rounded-full bg-[#707AD6]/10 flex items-center justify-center">
-            <UserPlus className="w-5 h-5 text-[#707AD6]" />
+            <Share2 className="w-5 h-5 text-[#707AD6]" />
           </div>
           <div>
             <h3 className="text-[#B7A08C] font-heading font-semibold text-base">
@@ -94,25 +96,26 @@ export default function Community() {
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <Input
-            type="email"
-            placeholder="email@exemple.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="bg-white/50 border-[#B7A08C]/20 text-[#B7A08C] placeholder-[#B7A08C]/30 
-                       rounded-xl focus:ring-[#707AD6]/30 font-body"
-            onKeyDown={(e) => e.key === "Enter" && handleInvite()}
-          />
-          <Button
-            onClick={handleInvite}
-            disabled={inviting}
-            className="bg-[#707AD6] hover:bg-[#3E47AB] text-[#F9EFE4] rounded-xl px-4 
-                       transition-all duration-200 shrink-0"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
+        <div className="grid grid-cols-2 gap-3">
+          {shareOptions.map((opt) => (
+            <button
+              key={opt.label}
+              onClick={() => handleShare(opt.url)}
+              className={`${opt.color} text-white rounded-2xl py-3 px-4 text-sm font-semibold font-body transition-opacity hover:opacity-90 active:opacity-75`}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
+
+        {navigator.share && (
+          <button
+            onClick={handleNativeShare}
+            className="mt-3 w-full bg-[#707AD6]/10 text-[#707AD6] rounded-2xl py-3 text-sm font-semibold font-body hover:bg-[#707AD6]/20 transition-colors"
+          >
+            Share via…
+          </button>
+        )}
       </motion.div>
 
       {/* Community Feed */}
@@ -135,7 +138,7 @@ export default function Community() {
         ) : Object.keys(groupedByUser).length === 0 ? (
           <div className="text-center py-12">
             <Heart className="w-12 h-12 text-[#F9EFE4]/20 mx-auto mb-4" />
-            <p className="text-stone-300 font-body">
+            <p className="text-[#8D92D4] font-body">
               Invite your friends to share positive moments here!
             </p>
           </div>

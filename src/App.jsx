@@ -8,6 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
 import History from './pages/History';
 import Community from './pages/Community';
+import FontUpload from './pages/FontUpload';
 import AppLayout from './components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -40,6 +41,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/history" element={<History />} />
         <Route path="/community" element={<Community />} />
+        <Route path="/font-upload" element={<FontUpload />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
