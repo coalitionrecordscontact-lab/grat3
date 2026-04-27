@@ -13,6 +13,18 @@
     "username": {
       "type": "string",
       "description": "Unique display name chosen by the user"
+    },
+    "timezone": {
+      "type": "string",
+      "description": "IANA timezone string e.g. Europe/Paris"
+    },
+    "notifications_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the user wants daily reminder emails"
     }
-  }
+  },
+  "required": [
+    "username"
+  ]
 }

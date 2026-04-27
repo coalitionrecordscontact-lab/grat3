@@ -26,6 +26,11 @@ const AuthenticatedApp = () => {
         const me = await base44.auth.me();
         setUser(me);
         if (!me.username) setNeedsUsername(true);
+        // Save timezone if not set or changed
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (tz && me.timezone !== tz) {
+          base44.auth.updateMe({ timezone: tz });
+        }
       }
       setCheckingUser(false);
     });
