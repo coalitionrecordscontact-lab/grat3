@@ -43,7 +43,7 @@ export default function Community() {
         <p className="text-[#8D92D4] text-sm font-medium uppercase tracking-widest mb-2 font-body">
           Together
         </p>
-        <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold">
+        <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight">
           Community
         </h1>
       </motion.div>

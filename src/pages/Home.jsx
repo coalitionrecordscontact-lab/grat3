@@ -73,7 +73,7 @@ export default function Home() {
         <p className="text-[#8D92D4] text-sm font-medium uppercase tracking-widest mb-2 font-body">
           {formattedDate}
         </p>
-        <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold leading-tight">
+        <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight leading-tight">
           Your 3 positive
           <br />
           moments today

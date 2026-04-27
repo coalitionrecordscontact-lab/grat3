@@ -28,7 +28,7 @@ export default function History() {
         <p className="text-[#8D92D4] text-sm font-medium uppercase tracking-widest mb-2 font-body">
           Your journey
         </p>
-        <h1 className="text-[#F9EFE4] text-3xl font-heading font-bold">
+        <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight">
           History
         </h1>
         {entries.length > 0 &&

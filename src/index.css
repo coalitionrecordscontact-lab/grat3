@@ -2,6 +2,13 @@
 
 @font-face {
   font-family: 'PPEditorialNew';
+  src: url('https://base44.app/api/apps/69ebc946938524d44fd026b0/files/mp/public/69ebc946938524d44fd026b0/aa902550f_PPEditorialNew-Ultralight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PPEditorialNew';
   src: url('https://base44.app/api/apps/69ebc946938524d44fd026b0/files/mp/public/69ebc946938524d44fd026b0/a25d3c4e4_PPEditorialNew-Italic.otf') format('opentype');
   font-weight: normal;
   font-style: italic;
@@ -13,7 +20,7 @@
 
 @layer base {
   :root {
-    --font-heading: 'PPEditorialNew', 'Playfair Display', serif;
+    --font-heading: 'PPEditorialNew', serif;
     --font-body: 'Inter', sans-serif;
 
     --background: 245 45% 64%;
