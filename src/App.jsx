@@ -8,7 +8,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
 import History from './pages/History';
-import Community from './pages/Community';
+import Community from './pages/Community.jsx';
 import FontUpload from './pages/FontUpload';
 import AppLayout from './components/AppLayout';
 import UsernameSetup from './components/UsernameSetup';
