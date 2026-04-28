@@ -22,9 +22,9 @@ export default function UsernameSetup({ onComplete }) {
     setLoading(true);
     setError("");
 
-    // Check uniqueness
-    const existing = await base44.entities.User.filter({ username: trimmed });
-    if (existing.length > 0) {
+    // Check uniqueness via backend function
+    const res = await base44.functions.invoke("searchUserByUsername", { username: trimmed });
+    if (res.data.found) {
       setError("This username is already taken. Try another.");
       setLoading(false);
       return;

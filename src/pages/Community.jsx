@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Share2, Users, Star, Heart } from "lucide-react";
+import { Users, Heart } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import AddFriendSearch from "../components/AddFriendSearch";
 
@@ -44,17 +44,13 @@ export default function Community() {
     initialData: []
   });
 
-  // Build userMap for friends
+  // Build userMap from friendships (username stored there)
   useEffect(() => {
-    if (followingEmails.length === 0) return;
-    Promise.all(
-      followingEmails.map((email) => base44.entities.User.filter({ email }))
-    ).then((results) => {
+    base44.auth.me().then(async (me) => {
+      const friendships = await base44.entities.Friendship.filter({ follower_email: me.email });
       const map = {};
-      results.forEach((users) => {
-        if (users.length > 0) {
-          map[users[0].email] = users[0].username || users[0].email;
-        }
+      friendships.forEach((f) => {
+        map[f.following_email] = f.following_username || f.following_email;
       });
       setUserMap(map);
     });
@@ -116,12 +112,9 @@ export default function Community() {
             </p>
           </div>
         ) : Object.keys(groupedByUser).length === 0 ? (
-          <div className="text-center py-12">
-            <Heart className="w-12 h-12 text-[#F9EFE4]/20 mx-auto mb-4" />
-            <p className="text-[#F9EFE4]/60 font-body">
-              Your friends haven't posted yet.
-            </p>
-          </div>
+          <p className="text-[#F9EFE4]/40 text-sm font-body text-center py-6">
+            Your friends haven't shared anything yet.
+          </p>
         ) : (
           <div className="space-y-4">
             {Object.entries(groupedByUser).map(([userEmail, userEntries], idx) => {
@@ -158,7 +151,7 @@ export default function Community() {
                         <div className="space-y-2">
                           {events.map((event, i) => (
                             <div key={i} className="flex items-start gap-2">
-                              <Star className="w-3.5 h-3.5 text-[#707AD6] mt-0.5 flex-shrink-0 fill-[#707AD6]" />
+                              <div className="w-3.5 h-3.5 rounded-full bg-[#707AD6] mt-0.5 flex-shrink-0" />
                               <p className="text-[#B7A08C] text-sm font-body">{event}</p>
                             </div>
                           ))}

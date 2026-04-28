@@ -13,13 +13,18 @@ export default function AddFriendSearch({ currentUser, following, onFollow }) {
     if (!query.trim()) return;
     setLoading(true);
     setResult(null);
-    const users = await base44.entities.User.filter({ username: query.trim() });
-    if (users.length === 0) {
+    try {
+      const res = await base44.functions.invoke("searchUserByUsername", { username: query.trim() });
+      const data = res.data;
+      if (!data.found) {
+        setResult("not_found");
+      } else if (data.user.email === currentUser.email) {
+        setResult("self");
+      } else {
+        setResult(data.user);
+      }
+    } catch (e) {
       setResult("not_found");
-    } else if (users[0].email === currentUser.email) {
-      setResult("self");
-    } else {
-      setResult(users[0]);
     }
     setLoading(false);
   };
@@ -83,7 +88,7 @@ export default function AddFriendSearch({ currentUser, following, onFollow }) {
             className="mt-3"
           >
             {result === "not_found" || result === "self" ? (
-              <p className="text-[#B7A08C]/60 text-xs font-body flex items-center gap-1">
+              <p className="text-red-400 text-xs font-body flex items-center gap-1">
                 <X className="w-3 h-3" />
                 {result === "self" ? "That's you!" : "No user found with this username."}
               </p>
