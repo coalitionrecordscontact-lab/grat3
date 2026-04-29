@@ -1,20 +1,24 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, CalendarDays, Users } from "lucide-react";
+import { Home, CalendarDays, Users, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 
 const tabs = [
   { path: "/", icon: Home, label: "Today" },
   { path: "/history", icon: CalendarDays, label: "History" },
   { path: "/community", icon: Users, label: "Community" },
+  { path: "/settings", icon: Settings, label: "Settings" },
 ];
 
 export default function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50">
-      <div className="bg-[#F9EFE4] rounded-t-3xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)] px-4 pb-6 pt-3">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 select-none">
+      <div
+        className="bg-[#F9EFE4] rounded-t-3xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)] px-4 pt-3"
+        style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
+      >
         <div className="flex justify-around items-center max-w-md mx-auto">
           {tabs.map((tab) => {
             const isActive = location.pathname === tab.path;

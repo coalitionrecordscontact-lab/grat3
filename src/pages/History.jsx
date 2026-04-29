@@ -1,10 +1,12 @@
 import React from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import DayCard from "../components/DayCard";
+import PullToRefresh from "../components/PullToRefresh";
 
 export default function History() {
+  const queryClient = useQueryClient();
   const { data: entries, isLoading } = useQuery({
     queryKey: ["gratitude-history"],
     queryFn: async () => {
@@ -19,6 +21,7 @@ export default function History() {
   });
 
   return (
+    <PullToRefresh onRefresh={() => queryClient.invalidateQueries({ queryKey: ["gratitude-history"] })}>
     <div className="min-h-screen bg-[#707AD6] pb-28 px-5 pt-10">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -56,6 +59,7 @@ export default function History() {
         )}
         </div>
       }
-    </div>);
-
+    </div>
+    </PullToRefresh>
+  );
 }

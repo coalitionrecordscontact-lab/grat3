@@ -10,6 +10,7 @@ import Home from './pages/Home';
 import History from './pages/History';
 import Community from './pages/Community.jsx';
 import FontUpload from './pages/FontUpload';
+import Settings from './pages/Settings';
 import AppLayout from './components/AppLayout';
 import UsernameSetup from './components/UsernameSetup';
 import { base44 } from '@/api/base44Client';
@@ -68,6 +69,7 @@ const AuthenticatedApp = () => {
         <Route path="/history" element={<History />} />
         <Route path="/community" element={<Community />} />
         <Route path="/font-upload" element={<FontUpload />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
@@ -75,9 +77,23 @@ const AuthenticatedApp = () => {
 };
 
 
+function ThemeProvider({ children }) {
+  React.useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = (e) => {
+      document.documentElement.classList.toggle("dark", e.matches);
+    };
+    apply(mq);
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+  return children;
+}
+
 function App() {
 
   return (
+    <ThemeProvider>
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
@@ -86,6 +102,7 @@ function App() {
         <Toaster />
       </QueryClientProvider>
     </AuthProvider>
+    </ThemeProvider>
   )
 }
 
