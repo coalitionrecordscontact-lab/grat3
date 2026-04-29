@@ -5,7 +5,6 @@ import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import EventCard from "../components/EventCard";
-import PullToRefresh from "../components/PullToRefresh";
 
 function getTodayString() {
   return format(new Date(), "yyyy-MM-dd");
@@ -64,12 +63,7 @@ export default function Home() {
 
   const formattedDate = format(new Date(), "EEEE, MMMM d yyyy");
 
-  const handleRefresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["gratitude", today] });
-  };
-
   return (
-    <PullToRefresh onRefresh={handleRefresh}>
     <div className="min-h-screen bg-[#707AD6] pb-28 px-5 pt-10">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -119,6 +113,5 @@ export default function Home() {
         )}
       </AnimatePresence>
     </div>
-    </PullToRefresh>
   );
 }
