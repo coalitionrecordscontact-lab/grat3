@@ -14,7 +14,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50">
-      <div className="bg-[#F9EFE4] rounded-t-3xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)] px-4 pb-6 pt-3">
+      <div className="bg-[#F9EFE4] rounded-t-3xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)] px-4 pt-3" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
         <div className="flex justify-around items-center max-w-md mx-auto">
           {tabs.map((tab) => {
             const isActive = location.pathname === tab.path;

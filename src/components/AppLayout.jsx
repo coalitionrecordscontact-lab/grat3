@@ -4,7 +4,10 @@ import BottomNav from "./BottomNav";
 
 export default function AppLayout() {
   return (
-    <div className="min-h-screen bg-[#707AD6]">
+    <div
+      className="min-h-screen bg-[#707AD6]"
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
+    >
       <Outlet />
       <BottomNav />
     </div>
