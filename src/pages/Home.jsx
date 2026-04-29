@@ -14,6 +14,11 @@ function getTodayString() {
 export default function Home() {
   const queryClient = useQueryClient();
   const today = getTodayString();
+  const [username, setUsername] = React.useState("");
+
+  React.useEffect(() => {
+    base44.auth.me().then((me) => setUsername(me.username || ""));
+  }, []);
 
   const { data: entries, isLoading } = useQuery({
     queryKey: ["gratitude", today],
@@ -79,6 +84,10 @@ export default function Home() {
           <br />
           moments today
         </h1>
+        {username && (
+          <p className="text-[#F9EFE4]/60 text-sm font-body mt-2">@{username}</p>
+        )}
+
       </motion.div>
 
       {isLoading ? (
