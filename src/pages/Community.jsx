@@ -102,7 +102,7 @@ export default function Community() {
 
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-3 border-[#F9EFE4]/30 border-t-[#F9EFE4] rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#F9EFE4]/30 border-t-[#F9EFE4] rounded-full animate-spin" />
           </div>
         ) : followingEmails.length === 0 ? (
           <div className="text-center py-12">
