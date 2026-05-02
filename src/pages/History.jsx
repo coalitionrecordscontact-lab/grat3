@@ -27,7 +27,7 @@ export default function History() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8">
         
-        <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight">
+        <h1 className="text-[#F9EFE4] text-3xl font-rounded">
           History
         </h1>
         {entries.length > 0 &&

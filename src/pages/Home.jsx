@@ -79,7 +79,7 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-10"
       >
-        <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight leading-tight">
+        <h1 className="text-[#F9EFE4] text-3xl font-rounded leading-tight">
           Your 3 positive
           <br />
           moments today

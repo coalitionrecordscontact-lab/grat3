@@ -73,7 +73,7 @@ export default function Community() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight">
+          <h1 className="text-[#F9EFE4] text-3xl font-rounded">
             Community
           </h1>
           <button

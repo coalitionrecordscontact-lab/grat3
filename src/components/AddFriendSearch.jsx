@@ -53,7 +53,7 @@ export default function AddFriendSearch({ currentUser, following, onFollow }) {
           <UserPlus className="w-5 h-5 text-[#727AD0]" />
         </div>
         <div>
-          <h3 className="text-[#727AD0] font-heading font-semibold text-base">Add a friend</h3>
+          <h3 className="text-[#727AD0] font-rounded text-base">Add a friend</h3>
           <p className="text-[#727AD0]/60 text-xs font-body">Search by username</p>
         </div>
       </div>

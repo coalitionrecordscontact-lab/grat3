@@ -6,7 +6,8 @@ module.exports = {
   	extend: {
   		fontFamily: {
   			heading: ['var(--font-heading)'],
-  			body: ['var(--font-body)', 'ArialRoundedBold', 'Inter', 'sans-serif']
+  			body: ['var(--font-body)'],
+  			rounded: ['var(--font-rounded)']
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

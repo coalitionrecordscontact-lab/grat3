@@ -28,7 +28,8 @@
 @layer base {
   :root {
     --font-heading: 'PPEditorialNew', serif;
-    --font-body: 'ArialRoundedBold', 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-rounded: 'ArialRoundedBold', 'Inter', sans-serif;
 
     --background: 245 45% 64%;
     --foreground: 235 45% 46%;

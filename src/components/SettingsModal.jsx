@@ -59,12 +59,12 @@ export default function SettingsModal({ isOpen, onClose }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 60 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl px-6 pt-6 pb-10"
-            style={{ paddingBottom: "calc(2.5rem + env(safe-area-inset-bottom))" }}
+            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl px-6 pt-6"
+            style={{ paddingBottom: "calc(3rem + env(safe-area-inset-bottom))", minHeight: "420px" }}
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-[#1A215B] text-2xl font-heading">Settings</h2>
+              <h2 className="text-[#1A215B] text-2xl font-rounded">Settings</h2>
               <button
                 onClick={onClose}
                 className="text-[#B7A08C] hover:text-[#1A215B] transition-colors"
