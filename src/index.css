@@ -8,6 +8,13 @@
 }
 
 @font-face {
+  font-family: 'ArialRoundedBold';
+  src: url('https://base44.app/api/apps/69ebc946938524d44fd026b0/files/mp/public/69ebc946938524d44fd026b0/a2f69a0df_ArialRoundedBold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
   font-family: 'PPEditorialNew';
   src: url('https://base44.app/api/apps/69ebc946938524d44fd026b0/files/mp/public/69ebc946938524d44fd026b0/a25d3c4e4_PPEditorialNew-Italic.otf') format('opentype');
   font-weight: normal;
@@ -21,7 +28,7 @@
 @layer base {
   :root {
     --font-heading: 'PPEditorialNew', serif;
-    --font-body: 'Inter', sans-serif;
+    --font-body: 'ArialRoundedBold', 'Inter', sans-serif;
 
     --background: 245 45% 64%;
     --foreground: 235 45% 46%;

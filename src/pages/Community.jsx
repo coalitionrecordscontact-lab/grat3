@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Users, Heart } from "lucide-react";
+import { Users, Heart, Settings } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import AddFriendSearch from "../components/AddFriendSearch";
+import SettingsModal from "../components/SettingsModal";
 
 export default function Community() {
   const APP_URL = window.location.origin;
@@ -12,6 +13,7 @@ export default function Community() {
   const [currentUser, setCurrentUser] = useState(null);
   const [followingEmails, setFollowingEmails] = useState([]);
   const [userMap, setUserMap] = useState({});
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleNativeShare = async () => {
     if (navigator.share) {
@@ -70,10 +72,20 @@ export default function Community() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8">
-        <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight">
-          Community
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight">
+            Community
+          </h1>
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="w-10 h-10 rounded-full bg-[#F9EFE4]/15 flex items-center justify-center hover:bg-[#F9EFE4]/25 transition-colors"
+          >
+            <Settings className="w-5 h-5 text-[#F9EFE4]" />
+          </button>
+        </div>
       </motion.div>
+
+      <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
 
       {/* Add Friend Search */}
       {currentUser && (
