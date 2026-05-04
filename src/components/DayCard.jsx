@@ -20,7 +20,7 @@ export default function DayCard({ entry, index }) {
       className="bg-[#F9EFE4] rounded-3xl p-6 shadow-md">
       
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[#B7A08C] font-heading text-lg font-semibold capitalize">
+        <h3 className="text-[#B7A08C] font-rounded text-lg capitalize">
           {formatDayLabel(entry.date)}
         </h3>
         <div className="flex gap-1">
@@ -37,7 +37,7 @@ export default function DayCard({ entry, index }) {
         {events.map((event, i) =>
         <div key={i} className="flex items-start gap-3">
             <div className="bg-[hsl(var(--card-foreground))] mt-0.5 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
-              <span className="text-[hsl(var(--card))] text-xs font-semibold">
+              <span className="text-[#F8F0E5] text-xs font-semibold">
                 {i + 1}
               </span>
             </div>
