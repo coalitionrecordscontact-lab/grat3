@@ -59,8 +59,8 @@ export default function SettingsModal({ isOpen, onClose }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 60 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl px-6 pt-6"
-            style={{ paddingBottom: "calc(3rem + env(safe-area-inset-bottom))", minHeight: "420px" }}
+            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl px-6 pt-6 overflow-y-auto"
+            style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))", maxHeight: "80vh" }}
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
