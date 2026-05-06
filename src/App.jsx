@@ -12,6 +12,7 @@ import Community from './pages/Community.jsx';
 import FontUpload from './pages/FontUpload';
 import AppLayout from './components/AppLayout';
 import UsernameSetup from './components/UsernameSetup';
+import AffirmationsSetup from './components/AffirmationsSetup';
 import { base44 } from '@/api/base44Client';
 
 // Auto dark mode based on system preference
@@ -33,6 +34,7 @@ const AuthenticatedApp = () => {
   const [user, setUser] = React.useState(null);
   const [checkingUser, setCheckingUser] = React.useState(true);
   const [needsUsername, setNeedsUsername] = React.useState(false);
+  const [needsAffirmations, setNeedsAffirmations] = React.useState(false);
 
   React.useEffect(() => {
     base44.auth.isAuthenticated().then(async (authed) => {
@@ -40,6 +42,7 @@ const AuthenticatedApp = () => {
         const me = await base44.auth.me();
         setUser(me);
         if (!me.username) setNeedsUsername(true);
+        else if (!me.affirmation_1) setNeedsAffirmations(true);
         // Save timezone if not set or changed
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         if (tz && me.timezone !== tz) {
@@ -71,7 +74,11 @@ const AuthenticatedApp = () => {
   }
 
   if (needsUsername) {
-    return <UsernameSetup onComplete={(u) => { setNeedsUsername(false); setUser({ ...user, username: u }); }} />;
+    return <UsernameSetup onComplete={(u) => { setNeedsUsername(false); setUser({ ...user, username: u }); setNeedsAffirmations(true); }} />;
+  }
+
+  if (needsAffirmations) {
+    return <AffirmationsSetup onComplete={() => setNeedsAffirmations(false)} />;
   }
 
   // Render the main app

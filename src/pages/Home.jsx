@@ -15,9 +15,13 @@ export default function Home() {
   const queryClient = useQueryClient();
   const today = getTodayString();
   const [username, setUsername] = React.useState("");
+  const [affirmations, setAffirmations] = React.useState([]);
 
   React.useEffect(() => {
-    base44.auth.me().then((me) => setUsername(me.username || ""));
+    base44.auth.me().then((me) => {
+      setUsername(me.username || "");
+      setAffirmations([me.affirmation_1, me.affirmation_2, me.affirmation_3].filter(Boolean));
+    });
   }, []);
 
   const { data: entries, isLoading } = useQuery({
@@ -104,6 +108,16 @@ export default function Home() {
               saved={!!todayEntry?.[`event_${i + 1}`]}
               onSave={(value) => handleSave(i, value)}
             />
+          ))}
+        </div>
+      )}
+
+      {affirmations.length > 0 && (
+        <div className="mt-8 space-y-2">
+          {affirmations.map((aff, i) => (
+            <p key={i} className="text-[#F9EFE4]/50 text-sm font-body text-center">
+              {aff}
+            </p>
           ))}
         </div>
       )}

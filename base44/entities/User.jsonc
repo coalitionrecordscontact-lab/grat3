@@ -22,6 +22,18 @@
       "type": "boolean",
       "default": true,
       "description": "Whether the user wants daily reminder emails"
+    },
+    "affirmation_1": {
+      "type": "string",
+      "description": "First personal affirmation"
+    },
+    "affirmation_2": {
+      "type": "string",
+      "description": "Second personal affirmation"
+    },
+    "affirmation_3": {
+      "type": "string",
+      "description": "Third personal affirmation"
     }
   },
   "required": [
