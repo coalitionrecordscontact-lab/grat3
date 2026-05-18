@@ -145,7 +145,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 bg-[#F9EFE4]/20 backdrop-blur-sm rounded-full px-6 py-3">
               <Sparkles className="w-5 h-5 text-[#F9EFE4]" />
               <span className="text-[#F9EFE4] font-medium text-sm font-body">
-                Well done! You completed your day
+                You've completed your day
               </span>
             </div>
           </motion.div>

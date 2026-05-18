@@ -1,12 +1,11 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, CalendarDays, Users, Sparkles } from "lucide-react";
+import { Home, CalendarDays, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
 const tabs = [
   { path: "/", icon: Home, label: "Today" },
   { path: "/history", icon: CalendarDays, label: "History" },
-  { path: "/retrospective", icon: Sparkles, label: "Retro" },
   { path: "/community", icon: Users, label: "Community" },
 ];
 

@@ -1,0 +1,25 @@
+{
+  "name": "MonthlyEntry",
+  "type": "object",
+  "properties": {
+    "month": {
+      "type": "string",
+      "description": "The month in YYYY-MM format"
+    },
+    "event_1": {
+      "type": "string",
+      "description": "First positive moment of the month"
+    },
+    "event_2": {
+      "type": "string",
+      "description": "Second positive moment of the month"
+    },
+    "event_3": {
+      "type": "string",
+      "description": "Third positive moment of the month"
+    }
+  },
+  "required": [
+    "month"
+  ]
+}
