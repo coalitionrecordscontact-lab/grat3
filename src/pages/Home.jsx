@@ -129,7 +129,7 @@ export default function Home() {
                 setValidated(true);
                 if (affirmations.length > 0) setShowCarousel(true);
               }}
-              className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform text-[hsl(var(--card))] bg-[hsl(var(--popover))]">
+              className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform bg-[hsl(var(--popover))] text-[hsl(var(--background))]">
               
               Validate my day ✓
             </button>
