@@ -73,10 +73,10 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
               />
             ) : (
               <p
-                className={`text-sm font-body leading-relaxed ${events[i] ? "text-[#B7A08C]" : "text-[#B7A08C]/30 italic"} ${isCurrent ? "cursor-text" : ""}`}
+                className={`text-sm font-body leading-relaxed ${events[i] ? "text-[#B7A08C]" : "text-[#B7A08C]/30"} ${isCurrent ? "cursor-text" : ""}`}
                 onClick={() => handleEdit(i)}
               >
-                {events[i] || (isCurrent ? "Tap to add a moment…" : "—")}
+                {events[i] || (isCurrent ? "Tap to add a highlight…" : "—")}
               </p>
             )}
           </div>
