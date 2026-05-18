@@ -9,6 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
 import History from './pages/History';
 import Community from './pages/Community.jsx';
+import Retrospective from './pages/Retrospective.jsx';
 import FontUpload from './pages/FontUpload';
 import AppLayout from './components/AppLayout';
 import UsernameSetup from './components/UsernameSetup';
@@ -87,6 +88,7 @@ const AuthenticatedApp = () => {
       <Route element={<AppLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/history" element={<History />} />
+        <Route path="/retrospective" element={<Retrospective />} />
         <Route path="/community" element={<Community />} />
         <Route path="/font-upload" element={<FontUpload />} />
       </Route>

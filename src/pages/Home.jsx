@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import EventCard from "../components/EventCard";
 import PullToRefresh from "../components/PullToRefresh";
+import AffirmationsCarousel from "../components/AffirmationsCarousel";
 
 function getTodayString() {
   return format(new Date(), "yyyy-MM-dd");
@@ -16,6 +17,8 @@ export default function Home() {
   const today = getTodayString();
   const [username, setUsername] = React.useState("");
   const [affirmations, setAffirmations] = React.useState([]);
+  const [validated, setValidated] = React.useState(false);
+  const [showCarousel, setShowCarousel] = React.useState(false);
 
   React.useEffect(() => {
     base44.auth.me().then((me) => {
@@ -106,24 +109,33 @@ export default function Home() {
               index={i}
               value={todayEntry?.[`event_${i + 1}`] || ""}
               saved={!!todayEntry?.[`event_${i + 1}`]}
+              locked={validated}
               onSave={(value) => handleSave(i, value)}
             />
           ))}
         </div>
       )}
 
-      {affirmations.length > 0 && (
-        <div className="mt-8 space-y-2">
-          {affirmations.map((aff, i) => (
-            <p key={i} className="text-[#F9EFE4]/50 text-sm font-body text-center">
-              {aff}
-            </p>
-          ))}
-        </div>
-      )}
-
       <AnimatePresence>
-        {allSaved && (
+        {allSaved && !validated && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="mt-8"
+          >
+            <button
+              onClick={() => {
+                setValidated(true);
+                if (affirmations.length > 0) setShowCarousel(true);
+              }}
+              className="w-full bg-[#F9EFE4] text-[#1A215B] font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform"
+            >
+              Validate my day ✓
+            </button>
+          </motion.div>
+        )}
+        {validated && !showCarousel && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -137,6 +149,15 @@ export default function Home() {
               </span>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showCarousel && affirmations.length > 0 && (
+          <AffirmationsCarousel
+            affirmations={affirmations}
+            onClose={() => setShowCarousel(false)}
+          />
         )}
       </AnimatePresence>
     </div>

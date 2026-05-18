@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
-export default function EventCard({ index, value, onSave, saved }) {
+export default function EventCard({ index, value, onSave, saved, locked }) {
   const [text, setText] = useState(value || "");
   const [isFocused, setIsFocused] = useState(false);
+
+  // Sync value from parent when it changes
+  React.useEffect(() => {
+    setText(value || "");
+  }, [value]);
 
   const numbers = ["01", "02", "03"];
 
@@ -24,7 +29,7 @@ export default function EventCard({ index, value, onSave, saved }) {
       <div
         className={`bg-[#F9EFE4] rounded-2xl px-5 py-5 transition-all duration-300 flex items-center gap-4 ${
           isFocused ? "shadow-xl scale-[1.01]" : "shadow-md"
-        } ${saved ? "ring-2 ring-[#707AD6]/20" : ""}`}
+        } ${saved && !locked ? "ring-2 ring-[#707AD6]/20" : ""} ${locked ? "opacity-80" : ""}`}
       >
         <span className="text-[#B7A08C]/40 text-xs font-semibold font-body flex-shrink-0 w-6">
           {numbers[index]}
@@ -37,7 +42,7 @@ export default function EventCard({ index, value, onSave, saved }) {
           onFocus={() => setIsFocused(true)}
           onBlur={handleSave}
           onKeyDown={(e) => e.key === "Enter" && handleSave()}
-          readOnly={saved}
+          readOnly={locked}
           className="flex-1 bg-transparent text-[#B7A08C] placeholder-[#B7A08C]/30 
                      text-base font-body outline-none min-w-0"
           placeholder={`Positive moment ${index + 1}...`}
