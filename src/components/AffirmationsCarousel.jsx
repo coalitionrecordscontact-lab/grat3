@@ -4,11 +4,9 @@ import { X } from "lucide-react";
 
 export default function AffirmationsCarousel({ affirmations, onClose }) {
   const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1);
 
   const handleNext = () => {
     if (current < affirmations.length - 1) {
-      setDirection(1);
       setCurrent((c) => c + 1);
     } else {
       onClose();
@@ -32,15 +30,15 @@ export default function AffirmationsCarousel({ affirmations, onClose }) {
         <X className="w-6 h-6" />
       </button>
 
-      <div className="relative flex items-center justify-center w-full max-w-sm" style={{ height: 340 }}>
+      <div className="relative flex items-center justify-center" style={{ width: 200, height: 320 }}>
         {/* Stacked cards behind */}
         {[...Array(Math.min(remaining, 2))].map((_, i) => (
           <div
             key={i}
             className="absolute bg-[#F9EFE4] rounded-3xl shadow-xl"
             style={{
-              width: "100%",
-              height: 280,
+              width: 200,
+              height: 300,
               transform: `translateY(${(i + 1) * 10}px) scale(${1 - (i + 1) * 0.04})`,
               opacity: 1 - (i + 1) * 0.25,
               zIndex: 10 - i,
@@ -57,17 +55,14 @@ export default function AffirmationsCarousel({ affirmations, onClose }) {
             exit={{ opacity: 0, scale: 0.88, y: -20 }}
             transition={{ type: "spring", stiffness: 280, damping: 26 }}
             onClick={handleNext}
-            className="absolute bg-[#F9EFE4] rounded-3xl shadow-2xl cursor-pointer flex flex-col items-center justify-center px-8 py-12 text-center select-none"
-            style={{ width: "100%", height: 280, zIndex: 20 }}
+            className="absolute bg-[#F9EFE4] rounded-3xl shadow-2xl cursor-pointer flex flex-col items-center justify-center px-6 py-10 text-center select-none"
+            style={{ width: 200, height: 300, zIndex: 20 }}
           >
             <p className="text-[#B7A08C]/50 text-xs font-rounded uppercase tracking-widest mb-6">
-              Affirmation {current + 1} / {affirmations.length}
+              {current + 1} / {affirmations.length}
             </p>
-            <p className="text-[#1A215B] text-xl font-heading italic leading-relaxed">
+            <p className="text-[#1A215B] text-lg font-heading italic leading-relaxed">
               "{affirmations[current]}"
-            </p>
-            <p className="text-[#B7A08C]/50 text-xs font-body mt-8">
-              {current < affirmations.length - 1 ? "Tap to continue →" : "Tap to close"}
             </p>
           </motion.div>
         </AnimatePresence>

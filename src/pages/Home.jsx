@@ -131,7 +131,7 @@ export default function Home() {
               }}
               className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform bg-[hsl(var(--popover))] text-[hsl(var(--background))]">
               
-              Validate my day ✓
+              validate
             </button>
           </motion.div>
           }
