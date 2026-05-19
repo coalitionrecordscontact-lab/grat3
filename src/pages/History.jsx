@@ -75,9 +75,9 @@ export default function History() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-5 py-2 rounded-full font-rounded text-sm transition-all text-[hsl(var(--background))] ${
+            className={`px-5 py-2 rounded-full font-rounded text-sm transition-all ${
             tab === t ?
-            "bg-[#F9EFE4]" :
+            "bg-[#F8F0E5] text-[#807AC7]" :
             "bg-[#F9EFE4]/20 text-[#F9EFE4]/70"}`
             }>
             

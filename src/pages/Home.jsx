@@ -129,7 +129,7 @@ export default function Home() {
                 setValidated(true);
                 if (affirmations.length > 0) setShowCarousel(true);
               }}
-              className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform text-[hsl(var(--background))] bg-[hsl(var(--card))]">
+              className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform text-[#807AC7] bg-[#F8F0E5]">
               
               validate
             </button>
