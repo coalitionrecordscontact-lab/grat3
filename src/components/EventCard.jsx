@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
@@ -13,7 +13,17 @@ export default function EventCard({ index, value, onSave, saved, locked }) {
 
   const numbers = ["01", "02", "03"];
 
+  const inputRef = React.useRef(null);
+
+  // Dismiss keyboard when component unmounts (tab change, navigation)
+  React.useEffect(() => {
+    return () => {
+      if (inputRef.current) inputRef.current.blur();
+    };
+  }, []);
+
   const handleSave = () => {
+    if (inputRef.current) inputRef.current.blur();
     if (text.trim()) {
       onSave(text.trim());
     }
@@ -36,6 +46,7 @@ export default function EventCard({ index, value, onSave, saved, locked }) {
         </span>
 
         <input
+          ref={inputRef}
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}

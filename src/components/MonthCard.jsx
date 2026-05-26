@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { format, parseISO } from "date-fns";
@@ -20,7 +20,17 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
     setDraft(events[i] || "");
   };
 
+  const inputRef = React.useRef(null);
+
+  // Dismiss keyboard on unmount to prevent iOS RTIInputSystemClient crash
+  React.useEffect(() => {
+    return () => {
+      if (inputRef.current) inputRef.current.blur();
+    };
+  }, []);
+
   const handleSave = async (i) => {
+    if (inputRef.current) inputRef.current.blur();
     if (!draft.trim()) { setEditing(null); return; }
     setSaving(true);
     const field = `event_${i + 1}`;
@@ -63,6 +73,7 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
             </div>
             {editing === i ? (
               <input
+                ref={inputRef}
                 autoFocus
                 className="flex-1 text-[#B7A08C] text-sm font-body bg-transparent border-b border-[#B7A08C]/40 outline-none pb-1"
                 value={draft}
