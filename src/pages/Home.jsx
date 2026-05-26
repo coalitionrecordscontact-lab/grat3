@@ -15,7 +15,7 @@ function getTodayString() {
 export default function Home() {
   const queryClient = useQueryClient();
   const today = getTodayString();
-  const [username, setUsername] = React.useState("");
+  const [username, setUsername] = React.useState(null);
   const [affirmations, setAffirmations] = React.useState([]);
   const [validated, setValidated] = React.useState(false);
   const [showCarousel, setShowCarousel] = React.useState(false);

@@ -22,6 +22,7 @@ export default function BottomNav() {
               <Link
                 key={tab.path}
                 to={tab.path}
+                onClick={() => document.activeElement?.blur()}
                 className="flex flex-col items-center gap-1 relative px-6 py-2"
               >
                 {isActive && (
