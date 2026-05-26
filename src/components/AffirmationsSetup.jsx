@@ -39,7 +39,7 @@ export default function AffirmationsSetup({ onComplete }) {
         <h1 className="text-[#F9EFE4] text-3xl font-rounded mb-2">
           Your affirmations
         </h1>
-        <p className="text-[#8D92D4] text-sm font-body mb-8">
+        <p className="text-[#F9EFE4]/80 text-sm font-body mb-8">
           3 positive truths about yourself. They'll stay with you every day.
         </p>
 

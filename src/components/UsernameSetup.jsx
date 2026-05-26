@@ -42,10 +42,10 @@ export default function UsernameSetup({ onComplete }) {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
-        <h1 className="text-[#F9EFE4] text-3xl font-heading font-extralight mb-2">
+        <h1 className="text-[#F9EFE4] text-3xl font-rounded mb-2">
           Choose your username
         </h1>
-        <p className="text-[#8D92D4] text-sm font-body mb-8">
+        <p className="text-[#F9EFE4]/80 text-sm font-body mb-8">
           This is how you'll appear in the community feed.
         </p>
 
