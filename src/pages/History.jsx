@@ -38,8 +38,9 @@ export default function History() {
   const currentMonth = getCurrentMonth();
 
   // Ensure current month always appears at the top
-  const currentMonthEntry = monthEntries.find((e) => e.month === currentMonth) || { month: currentMonth };
-  const pastMonthEntries = monthEntries.filter((e) => e.month !== currentMonth);
+  const safeMonthEntries = Array.isArray(monthEntries) ? monthEntries : [];
+  const currentMonthEntry = safeMonthEntries.find((e) => e.month === currentMonth) || { month: currentMonth };
+  const pastMonthEntries = safeMonthEntries.filter((e) => e.month !== currentMonth);
 
   const handleRefresh = async () => {
     if (tab === "days") await refetchDays();else
