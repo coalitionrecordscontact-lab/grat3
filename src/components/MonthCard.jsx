@@ -76,6 +76,7 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
                 ref={inputRef}
                 autoFocus
                 className="flex-1 text-[#B7A08C] text-sm font-body bg-transparent border-b border-[#B7A08C]/40 outline-none pb-1"
+                style={{ fontSize: "16px" }}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onBlur={() => handleSave(i)}

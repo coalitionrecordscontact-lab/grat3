@@ -17,12 +17,11 @@ export default function Home() {
   const today = getTodayString();
   const [username, setUsername] = React.useState(null);
   const [affirmations, setAffirmations] = React.useState([]);
-  const [manuallyValidated, setManuallyValidated] = React.useState(false);
   const [showCarousel, setShowCarousel] = React.useState(false);
 
   React.useEffect(() => {
     base44.auth.me().then((me) => {
-      setUsername(me?.username || "");
+      if (me?.username) setUsername(me.username);
       setAffirmations([me?.affirmation_1, me?.affirmation_2, me?.affirmation_3].filter(Boolean));
     }).catch(() => {});
   }, []);
@@ -37,24 +36,22 @@ export default function Home() {
         1
       );
     },
-    initialData: []
+    initialData: [],
+    placeholderData: (prev) => prev,
   });
 
   const todayEntry = Array.isArray(entries) && entries.length > 0 ? entries[0] : null;
   const allSaved = !!(todayEntry?.event_1 && todayEntry?.event_2 && todayEntry?.event_3);
-  const validated = allSaved && manuallyValidated;
+  // validated = persistent: if all 3 are saved in DB, day is always completed (survives app restart)
+  const validated = allSaved && !!todayEntry?.is_complete;
 
   const saveMutation = useMutation({
     mutationFn: async ({ field, value }) => {
       if (todayEntry) {
+        const updated = { ...todayEntry, [field]: value };
         return base44.entities.GratitudeEntry.update(todayEntry.id, {
           [field]: value,
-          is_complete:
-          field === "event_3" ?
-          !!(todayEntry.event_1 && todayEntry.event_2 && value) :
-          field === "event_2" ?
-          !!(todayEntry.event_1 && value && todayEntry.event_3) :
-          !!(value && todayEntry.event_2 && todayEntry.event_3)
+          // Never auto-set is_complete here; only the validate button does that
         });
       } else {
         return base44.entities.GratitudeEntry.create({
@@ -91,9 +88,9 @@ export default function Home() {
           <br />
           moments today
         </h1>
-        {username !== null && username !== "" &&
+        {username &&
           <p className="text-[#F9EFE4]/60 text-sm font-body mt-2">@{username}</p>
-          }
+        }
 
       </motion.div>
 
@@ -125,8 +122,12 @@ export default function Home() {
             className="mt-8">
             
             <button
-              onClick={() => {
-                setManuallyValidated(true);
+              onClick={async () => {
+                // Persist validation in DB so it survives app restart
+                if (todayEntry) {
+                  await base44.entities.GratitudeEntry.update(todayEntry.id, { is_complete: true });
+                  queryClient.invalidateQueries({ queryKey: ["gratitude", today] });
+                }
                 if (affirmations.length > 0) setShowCarousel(true);
               }}
               className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform text-[#807AC7] bg-[#F8F0E5]">
