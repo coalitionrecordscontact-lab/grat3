@@ -84,12 +84,13 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
                 disabled={saving}
               />
             ) : (
-              <p
-                className={`text-sm font-body leading-relaxed ${events[i] ? "text-[#B7A08C]" : "text-[#B7A08C]/30"} ${isCurrent ? "cursor-text" : ""}`}
-                onClick={() => handleEdit(i)}
+              <button
+                type="button"
+                onClick={() => isCurrent && handleEdit(i)}
+                className={`flex-1 text-left text-sm font-body leading-relaxed bg-transparent border-none outline-none p-0 ${events[i] ? "text-[#B7A08C]" : "text-[#B7A08C]/30"}`}
               >
                 {events[i] || (isCurrent ? "Tap to add a highlight…" : "—")}
-              </p>
+              </button>
             )}
           </div>
         ))}

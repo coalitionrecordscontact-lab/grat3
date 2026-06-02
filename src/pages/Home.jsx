@@ -21,9 +21,11 @@ export default function Home() {
 
   React.useEffect(() => {
     base44.auth.me().then((me) => {
-      if (me?.username) setUsername(me.username);
-      setAffirmations([me?.affirmation_1, me?.affirmation_2, me?.affirmation_3].filter(Boolean));
-    }).catch(() => {});
+      if (!me) return;
+      // auth.me() returns built-in fields; custom fields like username are also included
+      if (me.username) setUsername(me.username);
+      setAffirmations([me.affirmation_1, me.affirmation_2, me.affirmation_3].filter(Boolean));
+    });
   }, []);
 
   const { data: entries, isLoading } = useQuery({
@@ -37,7 +39,7 @@ export default function Home() {
       );
     },
     initialData: [],
-    placeholderData: (prev) => prev,
+    staleTime: 30000, // keep data fresh 30s — prevents blank flash on invalidate
   });
 
   const todayEntry = Array.isArray(entries) && entries.length > 0 ? entries[0] : null;
@@ -48,20 +50,28 @@ export default function Home() {
   const saveMutation = useMutation({
     mutationFn: async ({ field, value }) => {
       if (todayEntry) {
-        const updated = { ...todayEntry, [field]: value };
-        return base44.entities.GratitudeEntry.update(todayEntry.id, {
-          [field]: value,
-          // Never auto-set is_complete here; only the validate button does that
-        });
+        return base44.entities.GratitudeEntry.update(todayEntry.id, { [field]: value });
       } else {
-        return base44.entities.GratitudeEntry.create({
-          date: today,
-          [field]: value,
-          is_complete: false
-        });
+        return base44.entities.GratitudeEntry.create({ date: today, [field]: value, is_complete: false });
       }
     },
-    onSuccess: () => {
+    onMutate: async ({ field, value }) => {
+      // Optimistic update: immediately reflect the new value in cache
+      await queryClient.cancelQueries({ queryKey: ["gratitude", today] });
+      const previous = queryClient.getQueryData(["gratitude", today]);
+      queryClient.setQueryData(["gratitude", today], (old) => {
+        const arr = Array.isArray(old) ? old : [];
+        if (arr.length > 0) {
+          return [{ ...arr[0], [field]: value }];
+        }
+        return [{ date: today, [field]: value, is_complete: false }];
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["gratitude", today], context.previous);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["gratitude", today] });
     }
   });
