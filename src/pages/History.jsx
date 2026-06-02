@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -14,39 +14,67 @@ function getCurrentMonth() {
 export default function History() {
   const [tab, setTab] = useState("days");
   const queryClient = useQueryClient();
+  const currentMonth = getCurrentMonth();
+
+  // Single source of truth for current user
+  const { data: currentUser } = useQuery({
+    queryKey: ["current-user"],
+    queryFn: () => base44.auth.me(),
+    staleTime: Infinity,
+  });
 
   // Days data
   const { data: rawEntries, isLoading: loadingDays, refetch: refetchDays } = useQuery({
-    queryKey: ["gratitude-history"],
+    queryKey: ["gratitude-history", currentUser?.id],
+    enabled: !!currentUser?.id,
     queryFn: async () => {
-      const user = await base44.auth.me();
-      return base44.entities.GratitudeEntry.filter({ created_by_id: user.id }, "-date", 200);
+      return base44.entities.GratitudeEntry.filter(
+        { created_by_id: currentUser.id },
+        "-date",
+        200
+      );
     },
-    initialData: []
+    initialData: [],
   });
   const entries = Array.isArray(rawEntries) ? rawEntries : [];
 
   // Months data
   const { data: rawMonthEntries, isLoading: loadingMonths, refetch: refetchMonths } = useQuery({
-    queryKey: ["monthly-history"],
+    queryKey: ["monthly-history", currentUser?.id],
+    enabled: !!currentUser?.id,
     queryFn: async () => {
-      const user = await base44.auth.me();
-      return base44.entities.MonthlyEntry.filter({ created_by_id: user.id }, "-month", 100);
+      return base44.entities.MonthlyEntry.filter(
+        { created_by_id: currentUser.id },
+        "-month",
+        100
+      );
     },
-    initialData: []
+    initialData: [],
   });
   const monthEntries = Array.isArray(rawMonthEntries) ? rawMonthEntries : [];
 
-  const currentMonth = getCurrentMonth();
+  // Current month entry — create in DB if missing so MonthCard always has a real id
+  const [currentMonthEntry, setCurrentMonthEntry] = useState(null);
 
-  // Ensure current month always appears at the top
-  const safeMonthEntries = monthEntries;
-  const currentMonthEntry = safeMonthEntries.find((e) => e.month === currentMonth) || { month: currentMonth };
-  const pastMonthEntries = safeMonthEntries.filter((e) => e.month !== currentMonth);
+  useEffect(() => {
+    if (loadingMonths) return;
+    const existing = monthEntries.find((e) => e.month === currentMonth);
+    if (existing) {
+      setCurrentMonthEntry(existing);
+    } else {
+      // Create the entry so MonthCard can update it
+      base44.entities.MonthlyEntry.create({ month: currentMonth }).then((created) => {
+        setCurrentMonthEntry(created);
+        queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.id] });
+      });
+    }
+  }, [monthEntries, loadingMonths]);
+
+  const pastMonthEntries = monthEntries.filter((e) => e.month !== currentMonth);
 
   const handleRefresh = async () => {
-    if (tab === "days") await refetchDays();else
-    await refetchMonths();
+    if (tab === "days") await refetchDays();
+    else await refetchMonths();
   };
 
   const isLoading = tab === "days" ? loadingDays : loadingMonths;
@@ -57,75 +85,81 @@ export default function History() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6">
-          
+          className="mb-6"
+        >
           <h1 className="text-[#F9EFE4] text-3xl font-rounded">History</h1>
-          {tab === "days" && entries.length > 0 &&
-          <p className="text-[#F9EFE4]/60 text-sm mt-2 font-body">
+          {tab === "days" && entries.length > 0 && (
+            <p className="text-[#F9EFE4]/60 text-sm mt-2 font-body">
               {entries.length} day{entries.length > 1 ? "s" : ""} recorded
             </p>
-          }
-          {tab === "months" && monthEntries.length > 0 &&
-          <p className="text-[#F9EFE4]/60 text-sm mt-2 font-body">
+          )}
+          {tab === "months" && monthEntries.length > 0 && (
+            <p className="text-[#F9EFE4]/60 text-sm mt-2 font-body">
               {monthEntries.length} month{monthEntries.length > 1 ? "s" : ""} recorded
             </p>
-          }
+          )}
         </motion.div>
 
         {/* Tab buttons */}
         <div className="flex gap-2 mb-6">
-          {["days", "months"].map((t) =>
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-5 py-2 rounded-full font-rounded text-sm transition-all ${
-            tab === t ?
-            "bg-[#F8F0E5] text-[#807AC7]" :
-            "bg-[#F9EFE4]/20 text-[#F9EFE4]/70"}`
-            }>
-            
+          {["days", "months"].map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-5 py-2 rounded-full font-rounded text-sm transition-all ${
+                tab === t
+                  ? "bg-[#F8F0E5] text-[#807AC7]"
+                  : "bg-[#F9EFE4]/20 text-[#F9EFE4]/70"
+              }`}
+            >
               {t.charAt(0).toUpperCase() + t.slice(1)}
             </button>
-          )}
+          ))}
         </div>
 
-        {isLoading ?
-        <div className="flex justify-center py-20">
+        {isLoading ? (
+          <div className="flex justify-center py-20">
             <div className="w-8 h-8 border-2 border-[#F9EFE4]/30 border-t-[#F9EFE4] rounded-full animate-spin" />
-          </div> :
-        tab === "days" ?
-        entries.length === 0 ?
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
-              <p className="text-stone-300 text-lg font-body">No entries yet</p>
-            </motion.div> :
-
-        <div className="space-y-4">
-              {entries.map((entry, index) =>
-          <DayCard key={entry.id} entry={entry} index={index} />
-          )}
-            </div> :
-
-
-        <div className="space-y-4">
-            <MonthCard
-            key={currentMonth}
-            entry={currentMonthEntry}
-            index={0}
-            isCurrent={true}
-            onUpdated={() => queryClient.invalidateQueries({ queryKey: ["monthly-history"] })} />
-          
-            {pastMonthEntries.map((entry, index) =>
-          <MonthCard
-            key={entry.id}
-            entry={entry}
-            index={index + 1}
-            isCurrent={false}
-            onUpdated={() => queryClient.invalidateQueries({ queryKey: ["monthly-history"] })} />
-
-          )}
           </div>
-        }
+        ) : tab === "days" ? (
+          entries.length === 0 ? (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+              <p className="text-stone-300 text-lg font-body">No entries yet</p>
+            </motion.div>
+          ) : (
+            <div className="space-y-4">
+              {entries.map((entry, index) => (
+                <DayCard key={entry.id} entry={entry} index={index} />
+              ))}
+            </div>
+          )
+        ) : (
+          <div className="space-y-4">
+            {currentMonthEntry && (
+              <MonthCard
+                key={currentMonthEntry.id || currentMonth}
+                entry={currentMonthEntry}
+                index={0}
+                isCurrent={true}
+                onUpdated={() => {
+                  queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.id] });
+                }}
+              />
+            )}
+            {pastMonthEntries.map((entry, index) => (
+              <MonthCard
+                key={entry.id || entry.month}
+                entry={entry}
+                index={index + 1}
+                isCurrent={false}
+                onUpdated={() => {
+                  queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.id] });
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
-    </PullToRefresh>);
-
+    </PullToRefresh>
+  );
 }

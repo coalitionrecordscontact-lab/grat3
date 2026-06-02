@@ -15,51 +15,67 @@ function getTodayString() {
 export default function Home() {
   const queryClient = useQueryClient();
   const today = getTodayString();
-  const [username, setUsername] = React.useState(null);
   const [affirmations, setAffirmations] = React.useState([]);
   const [showCarousel, setShowCarousel] = React.useState(false);
+  const [entryId, setEntryId] = React.useState(null);
+
+  // Single source of truth for current user
+  const { data: currentUser } = useQuery({
+    queryKey: ["current-user"],
+    queryFn: () => base44.auth.me(),
+    staleTime: Infinity,
+  });
 
   React.useEffect(() => {
-    base44.auth.me().then((me) => {
-      if (!me) return;
-      // auth.me() returns built-in fields; custom fields like username are also included
-      if (me.username) setUsername(me.username);
-      setAffirmations([me.affirmation_1, me.affirmation_2, me.affirmation_3].filter(Boolean));
-    });
-  }, []);
+    if (!currentUser) return;
+    setAffirmations([currentUser.affirmation_1, currentUser.affirmation_2, currentUser.affirmation_3].filter(Boolean));
+  }, [currentUser]);
 
   const { data: entries, isLoading } = useQuery({
-    queryKey: ["gratitude", today],
+    queryKey: ["gratitude", today, currentUser?.id],
+    enabled: !!currentUser?.id,
     queryFn: async () => {
-      const user = await base44.auth.me();
       return base44.entities.GratitudeEntry.filter(
-        { date: today, created_by_id: user.id },
+        { date: today, created_by_id: currentUser.id },
         "-created_date",
         1
       );
     },
     initialData: [],
-    staleTime: 30000, // keep data fresh 30s — prevents blank flash on invalidate
+    staleTime: 30000,
   });
 
   const todayEntry = Array.isArray(entries) && entries.length > 0 ? entries[0] : null;
+
+  // Sync entryId from DB entry when loaded
+  React.useEffect(() => {
+    if (todayEntry?.id && !entryId) {
+      setEntryId(todayEntry.id);
+    }
+  }, [todayEntry?.id]);
+
   const allSaved = !!(todayEntry?.event_1 && todayEntry?.event_2 && todayEntry?.event_3);
-  // validated = persistent: if all 3 are saved in DB, day is always completed (survives app restart)
   const validated = allSaved && !!todayEntry?.is_complete;
 
   const saveMutation = useMutation({
     mutationFn: async ({ field, value }) => {
-      if (todayEntry) {
-        return base44.entities.GratitudeEntry.update(todayEntry.id, { [field]: value });
+      const id = entryId || todayEntry?.id;
+      if (id) {
+        return base44.entities.GratitudeEntry.update(id, { [field]: value });
       } else {
-        return base44.entities.GratitudeEntry.create({ date: today, [field]: value, is_complete: false });
+        const created = await base44.entities.GratitudeEntry.create({
+          date: today,
+          [field]: value,
+          is_complete: false,
+        });
+        setEntryId(created.id);
+        return created;
       }
     },
     onMutate: async ({ field, value }) => {
-      // Optimistic update: immediately reflect the new value in cache
-      await queryClient.cancelQueries({ queryKey: ["gratitude", today] });
-      const previous = queryClient.getQueryData(["gratitude", today]);
-      queryClient.setQueryData(["gratitude", today], (old) => {
+      await queryClient.cancelQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+      const previous = queryClient.getQueryData(["gratitude", today, currentUser?.id]);
+      queryClient.setQueryData(["gratitude", today, currentUser?.id], (old) => {
         const arr = Array.isArray(old) ? old : [];
         if (arr.length > 0) {
           return [{ ...arr[0], [field]: value }];
@@ -69,11 +85,13 @@ export default function Home() {
       return { previous };
     },
     onError: (_err, _vars, context) => {
-      if (context?.previous) queryClient.setQueryData(["gratitude", today], context.previous);
+      if (context?.previous) {
+        queryClient.setQueryData(["gratitude", today, currentUser?.id], context.previous);
+      }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["gratitude", today] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+    },
   });
 
   const handleSave = (index, value) => {
@@ -81,97 +99,97 @@ export default function Home() {
     saveMutation.mutate({ field, value });
   };
 
-  const formattedDate = format(new Date(), "EEEE, MMMM d yyyy");
+  const handleRefresh = () =>
+    queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
 
-  const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["gratitude", today] });
+  const username = currentUser?.username || currentUser?.email || null;
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="min-h-screen bg-[#707AD6] pb-28 px-5 pt-10">
-      <motion.div
+      <div className="min-h-screen bg-[#707AD6] pb-28 px-5 pt-10">
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-10">
-          
-        <h1 className="text-[#F9EFE4] text-3xl font-rounded leading-tight">
-          Your 3 positive
-          <br />
-          moments today
-        </h1>
-        {username &&
-          <p className="text-[#F9EFE4]/60 text-sm font-body mt-2">@{username}</p>
-        }
-
-      </motion.div>
-
-      {isLoading ?
-        <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#F9EFE4]/30 border-t-[#F9EFE4] rounded-full animate-spin" />
-        </div> :
-
-        <div className="space-y-5">
-          {[0, 1, 2].map((i) =>
-          <EventCard
-            key={i}
-            index={i}
-            value={todayEntry?.[`event_${i + 1}`] || ""}
-            saved={!!todayEntry?.[`event_${i + 1}`]}
-            locked={validated}
-            onSave={(value) => handleSave(i, value)} />
-
+          className="mb-10"
+        >
+          <h1 className="text-[#F9EFE4] text-3xl font-rounded leading-tight">
+            Your 3 positive
+            <br />
+            moments today
+          </h1>
+          {username && (
+            <p className="text-[#F9EFE4]/60 text-sm font-body mt-2">@{username}</p>
           )}
-        </div>
-        }
+        </motion.div>
 
-      <AnimatePresence>
-        {allSaved && !validated &&
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="mt-8">
-            
-            <button
-              onClick={async () => {
-                // Persist validation in DB so it survives app restart
-                if (todayEntry) {
-                  await base44.entities.GratitudeEntry.update(todayEntry.id, { is_complete: true });
-                  queryClient.invalidateQueries({ queryKey: ["gratitude", today] });
-                }
-                if (affirmations.length > 0) setShowCarousel(true);
-              }}
-              className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform text-[#807AC7] bg-[#F8F0E5]">
-              
-              validate
-            </button>
-          </motion.div>
-          }
-        {validated && !showCarousel &&
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            className="mt-8 text-center">
-            
-            <div className="inline-flex items-center gap-2 bg-[#F9EFE4]/20 backdrop-blur-sm rounded-full px-6 py-3">
-              <Sparkles className="w-5 h-5 text-[#F9EFE4]" />
-              <span className="text-[#F9EFE4] font-medium text-sm font-body">
-                You've completed your day
-              </span>
-            </div>
-          </motion.div>
-          }
-      </AnimatePresence>
+        {isLoading ? (
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-2 border-[#F9EFE4]/30 border-t-[#F9EFE4] rounded-full animate-spin" />
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {[0, 1, 2].map((i) => (
+              <EventCard
+                key={i}
+                index={i}
+                value={todayEntry?.[`event_${i + 1}`] || ""}
+                saved={!!todayEntry?.[`event_${i + 1}`]}
+                locked={validated}
+                onSave={(value) => handleSave(i, value)}
+              />
+            ))}
+          </div>
+        )}
 
-      <AnimatePresence>
-        {showCarousel && affirmations.length > 0 &&
-          <AffirmationsCarousel
-            affirmations={affirmations}
-            onClose={() => setShowCarousel(false)} />
+        <AnimatePresence>
+          {allSaved && !validated && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mt-8"
+            >
+              <button
+                onClick={async () => {
+                  const id = entryId || todayEntry?.id;
+                  if (id) {
+                    await base44.entities.GratitudeEntry.update(id, { is_complete: true });
+                    queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+                  }
+                  if (affirmations.length > 0) setShowCarousel(true);
+                }}
+                className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform text-[#807AC7] bg-[#F8F0E5]"
+              >
+                validate
+              </button>
+            </motion.div>
+          )}
+          {validated && !showCarousel && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              className="mt-8 text-center"
+            >
+              <div className="inline-flex items-center gap-2 bg-[#F9EFE4]/20 backdrop-blur-sm rounded-full px-6 py-3">
+                <Sparkles className="w-5 h-5 text-[#F9EFE4]" />
+                <span className="text-[#F9EFE4] font-medium text-sm font-body">
+                  You've completed your day
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          }
-      </AnimatePresence>
-    </div>
-    </PullToRefresh>);
-
+        <AnimatePresence>
+          {showCarousel && affirmations.length > 0 && (
+            <AffirmationsCarousel
+              affirmations={affirmations}
+              onClose={() => setShowCarousel(false)}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+    </PullToRefresh>
+  );
 }
