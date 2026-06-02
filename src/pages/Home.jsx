@@ -17,7 +17,7 @@ export default function Home() {
   const today = getTodayString();
   const [username, setUsername] = React.useState(null);
   const [affirmations, setAffirmations] = React.useState([]);
-  const [validated, setValidated] = React.useState(false);
+  const [manuallyValidated, setManuallyValidated] = React.useState(false);
   const [showCarousel, setShowCarousel] = React.useState(false);
 
   React.useEffect(() => {
@@ -32,7 +32,7 @@ export default function Home() {
     queryFn: async () => {
       const user = await base44.auth.me();
       return base44.entities.GratitudeEntry.filter(
-        { date: today, created_by: user.email },
+        { date: today, created_by_id: user.id },
         "-created_date",
         1
       );
@@ -40,9 +40,9 @@ export default function Home() {
     initialData: []
   });
 
-  const todayEntry = entries.length > 0 ? entries[0] : null;
-  const allSaved =
-  todayEntry?.event_1 && todayEntry?.event_2 && todayEntry?.event_3;
+  const todayEntry = Array.isArray(entries) && entries.length > 0 ? entries[0] : null;
+  const allSaved = !!(todayEntry?.event_1 && todayEntry?.event_2 && todayEntry?.event_3);
+  const validated = allSaved && manuallyValidated;
 
   const saveMutation = useMutation({
     mutationFn: async ({ field, value }) => {
@@ -126,7 +126,7 @@ export default function Home() {
             
             <button
               onClick={() => {
-                setValidated(true);
+                setManuallyValidated(true);
                 if (affirmations.length > 0) setShowCarousel(true);
               }}
               className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform text-[#807AC7] bg-[#F8F0E5]">

@@ -20,7 +20,7 @@ export default function History() {
     queryKey: ["gratitude-history"],
     queryFn: async () => {
       const user = await base44.auth.me();
-      return base44.entities.GratitudeEntry.filter({ created_by: user.email }, "-date", 200);
+      return base44.entities.GratitudeEntry.filter({ created_by_id: user.id }, "-date", 200);
     },
     initialData: []
   });
@@ -31,7 +31,7 @@ export default function History() {
     queryKey: ["monthly-history"],
     queryFn: async () => {
       const user = await base44.auth.me();
-      return base44.entities.MonthlyEntry.filter({ created_by: user.email }, "-month", 100);
+      return base44.entities.MonthlyEntry.filter({ created_by_id: user.id }, "-month", 100);
     },
     initialData: []
   });

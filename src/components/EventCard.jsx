@@ -56,6 +56,7 @@ export default function EventCard({ index, value, onSave, saved, locked }) {
           readOnly={locked}
           className="flex-1 bg-transparent text-[#B7A08C] placeholder-[#B7A08C]/30 
                      text-base font-body outline-none min-w-0"
+          style={{ fontSize: "16px" }}
           placeholder={`Positive moment ${index + 1}...`}
         />
 
