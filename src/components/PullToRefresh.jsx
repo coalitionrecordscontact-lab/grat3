@@ -36,8 +36,13 @@ export default function PullToRefresh({ onRefresh, children }) {
     if (y.get() >= THRESHOLD && !refreshing) {
       setRefreshing(true);
       animate(y, THRESHOLD * 0.7, { duration: 0.15 });
-      await onRefresh();
-      setRefreshing(false);
+      try {
+        await onRefresh();
+      } catch (_) {
+        // ignore refresh errors
+      } finally {
+        setRefreshing(false);
+      }
     }
     animate(y, 0, { type: "spring", stiffness: 300, damping: 30 });
   };
