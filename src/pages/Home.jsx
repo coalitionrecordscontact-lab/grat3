@@ -17,7 +17,8 @@ export default function Home() {
   const today = getTodayString();
   const [affirmations, setAffirmations] = React.useState([]);
   const [showCarousel, setShowCarousel] = React.useState(false);
-  const [entryId, setEntryId] = React.useState(null);
+  // Use a ref for entryId so it's always up-to-date synchronously inside mutationFn
+  const entryIdRef = React.useRef(null);
 
   // Single source of truth for current user
   const { data: currentUser } = useQuery({
@@ -47,19 +48,17 @@ export default function Home() {
 
   const todayEntry = Array.isArray(entries) && entries.length > 0 ? entries[0] : null;
 
-  // Sync entryId from DB entry when loaded
-  React.useEffect(() => {
-    if (todayEntry?.id && !entryId) {
-      setEntryId(todayEntry.id);
-    }
-  }, [todayEntry?.id]);
+  // Sync entryIdRef from DB entry whenever it changes
+  if (todayEntry?.id) {
+    entryIdRef.current = todayEntry.id;
+  }
 
   const allSaved = !!(todayEntry?.event_1 && todayEntry?.event_2 && todayEntry?.event_3);
   const validated = allSaved && !!todayEntry?.is_complete;
 
   const saveMutation = useMutation({
     mutationFn: async ({ field, value }) => {
-      const id = entryId || todayEntry?.id;
+      const id = entryIdRef.current;
       if (id) {
         return base44.entities.GratitudeEntry.update(id, { [field]: value });
       } else {
@@ -68,7 +67,7 @@ export default function Home() {
           [field]: value,
           is_complete: false,
         });
-        setEntryId(created.id);
+        entryIdRef.current = created.id;
         return created;
       }
     },
@@ -102,7 +101,7 @@ export default function Home() {
   const handleRefresh = () =>
     queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
 
-  const username = currentUser?.username || currentUser?.email || null;
+  const username = currentUser?.username || null;
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
@@ -151,7 +150,7 @@ export default function Home() {
             >
               <button
                 onClick={async () => {
-                  const id = entryId || todayEntry?.id;
+                  const id = entryIdRef.current;
                   if (id) {
                     await base44.entities.GratitudeEntry.update(id, { is_complete: true });
                     queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
