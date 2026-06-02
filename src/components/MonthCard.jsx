@@ -48,7 +48,7 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08, duration: 0.4 }}
+      transition={{ delay: Math.min(index * 0.08, 0.6), duration: 0.4 }}
       className="bg-[#F9EFE4] rounded-3xl p-6 shadow-md"
     >
       <div className="flex items-center justify-between mb-4">

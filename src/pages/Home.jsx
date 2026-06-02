@@ -22,9 +22,9 @@ export default function Home() {
 
   React.useEffect(() => {
     base44.auth.me().then((me) => {
-      setUsername(me.username || "");
-      setAffirmations([me.affirmation_1, me.affirmation_2, me.affirmation_3].filter(Boolean));
-    });
+      setUsername(me?.username || "");
+      setAffirmations([me?.affirmation_1, me?.affirmation_2, me?.affirmation_3].filter(Boolean));
+    }).catch(() => {});
   }, []);
 
   const { data: entries, isLoading } = useQuery({
@@ -91,7 +91,7 @@ export default function Home() {
           <br />
           moments today
         </h1>
-        {username &&
+        {username !== null && username !== "" &&
           <p className="text-[#F9EFE4]/60 text-sm font-body mt-2">@{username}</p>
           }
 
