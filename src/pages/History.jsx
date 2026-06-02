@@ -16,7 +16,7 @@ export default function History() {
   const queryClient = useQueryClient();
 
   // Days data
-  const { data: entries, isLoading: loadingDays, refetch: refetchDays } = useQuery({
+  const { data: rawEntries, isLoading: loadingDays, refetch: refetchDays } = useQuery({
     queryKey: ["gratitude-history"],
     queryFn: async () => {
       const user = await base44.auth.me();
@@ -24,9 +24,10 @@ export default function History() {
     },
     initialData: []
   });
+  const entries = Array.isArray(rawEntries) ? rawEntries : [];
 
   // Months data
-  const { data: monthEntries, isLoading: loadingMonths, refetch: refetchMonths } = useQuery({
+  const { data: rawMonthEntries, isLoading: loadingMonths, refetch: refetchMonths } = useQuery({
     queryKey: ["monthly-history"],
     queryFn: async () => {
       const user = await base44.auth.me();
@@ -34,11 +35,12 @@ export default function History() {
     },
     initialData: []
   });
+  const monthEntries = Array.isArray(rawMonthEntries) ? rawMonthEntries : [];
 
   const currentMonth = getCurrentMonth();
 
   // Ensure current month always appears at the top
-  const safeMonthEntries = Array.isArray(monthEntries) ? monthEntries : [];
+  const safeMonthEntries = monthEntries;
   const currentMonthEntry = safeMonthEntries.find((e) => e.month === currentMonth) || { month: currentMonth };
   const pastMonthEntries = safeMonthEntries.filter((e) => e.month !== currentMonth);
 
