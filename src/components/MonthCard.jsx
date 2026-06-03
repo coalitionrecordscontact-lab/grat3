@@ -4,7 +4,10 @@ import { base44 } from "@/api/base44Client";
 import { format, parseISO } from "date-fns";
 
 function formatMonthLabel(monthStr) {
-  return format(parseISO(monthStr + "-01"), "MMMM yyyy");
+  if (!monthStr || typeof monthStr !== "string") return "";
+  const date = parseISO(monthStr + "-01");
+  if (isNaN(date.getTime())) return monthStr;
+  return format(date, "MMMM yyyy");
 }
 
 export default function MonthCard({ entry, index, isCurrent, onUpdated }) {

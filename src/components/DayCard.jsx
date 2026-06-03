@@ -3,7 +3,9 @@ import { motion } from "framer-motion";
 import { format, isToday, isYesterday, parseISO } from "date-fns";
 
 function formatDayLabel(dateStr) {
+  if (!dateStr || typeof dateStr !== "string") return "";
   const date = parseISO(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
   if (isToday(date)) return "Today";
   if (isYesterday(date)) return "Yesterday";
   return format(date, "EEEE, MMMM d");

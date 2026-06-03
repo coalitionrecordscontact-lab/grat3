@@ -75,11 +75,11 @@ const AuthenticatedApp = () => {
   }
 
   if (needsUsername) {
-    return <UsernameSetup onComplete={(u) => { setNeedsUsername(false); setUser({ ...user, username: u }); setNeedsAffirmations(true); }} />;
+    return <UsernameSetup onComplete={(u) => { setNeedsUsername(false); setUser({ ...user, username: u }); queryClientInstance.invalidateQueries({ queryKey: ["current-user"] }); setNeedsAffirmations(true); }} />;
   }
 
   if (needsAffirmations) {
-    return <AffirmationsSetup onComplete={() => setNeedsAffirmations(false)} />;
+    return <AffirmationsSetup onComplete={() => { queryClientInstance.invalidateQueries({ queryKey: ["current-user"] }); setNeedsAffirmations(false); }} />;
   }
 
   // Render the main app
