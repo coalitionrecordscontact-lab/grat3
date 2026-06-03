@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -53,25 +53,10 @@ export default function History() {
   });
   const monthEntries = Array.isArray(rawMonthEntries) ? rawMonthEntries : [];
 
-  // Current month entry — create in DB if missing so MonthCard always has a real id
-  const [currentMonthEntry, setCurrentMonthEntry] = useState(null);
-  const creatingMonthRef = React.useRef(false);
-
-  useEffect(() => {
-    if (loadingMonths) return;
-    const existing = monthEntries.find((e) => e.month === currentMonth);
-    if (existing) {
-      setCurrentMonthEntry(existing);
-      creatingMonthRef.current = false;
-    } else if (!creatingMonthRef.current) {
-      // Guard against re-triggering on the invalidation caused by the create itself
-      creatingMonthRef.current = true;
-      base44.entities.MonthlyEntry.create({ month: currentMonth }).then((created) => {
-        setCurrentMonthEntry(created);
-        queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.id] });
-      });
-    }
-  }, [monthEntries, loadingMonths]);
+  // Current month entry — use the existing one, or a virtual (id-less) entry.
+  // MonthCard creates the real record only on first edit, avoiding empty duplicates.
+  const currentMonthEntry =
+    monthEntries.find((e) => e.month === currentMonth) || { month: currentMonth };
 
   const pastMonthEntries = monthEntries.filter((e) => e.month !== currentMonth);
 
