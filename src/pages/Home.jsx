@@ -19,6 +19,8 @@ export default function Home() {
   const [showCarousel, setShowCarousel] = React.useState(false);
   // Use a ref for entryId so it's always up-to-date synchronously inside mutationFn
   const entryIdRef = React.useRef(null);
+  // Holds the in-flight create promise to prevent concurrent duplicate creates
+  const createPromiseRef = React.useRef(null);
 
   // Single source of truth for current user
   const { data: currentUser } = useQuery({
@@ -58,18 +60,24 @@ export default function Home() {
 
   const saveMutation = useMutation({
     mutationFn: async ({ field, value }) => {
-      const id = entryIdRef.current;
-      if (id) {
-        return base44.entities.GratitudeEntry.update(id, { [field]: value });
-      } else {
-        const created = await base44.entities.GratitudeEntry.create({
-          date: today,
-          [field]: value,
-          is_complete: false,
-        });
-        entryIdRef.current = created.id;
-        return created;
+      // Already have an entry → just update
+      if (entryIdRef.current) {
+        return base44.entities.GratitudeEntry.update(entryIdRef.current, { [field]: value });
       }
+      // A create is already in flight → wait for it, then update the same record
+      if (createPromiseRef.current) {
+        const existing = await createPromiseRef.current;
+        return base44.entities.GratitudeEntry.update(existing.id, { [field]: value });
+      }
+      // First write of the day → create exactly one record
+      createPromiseRef.current = base44.entities.GratitudeEntry.create({
+        date: today,
+        [field]: value,
+        is_complete: false,
+      });
+      const created = await createPromiseRef.current;
+      entryIdRef.current = created.id;
+      return created;
     },
     onMutate: async ({ field, value }) => {
       await queryClient.cancelQueries({ queryKey: ["gratitude", today, currentUser?.id] });
@@ -101,7 +109,7 @@ export default function Home() {
   const handleRefresh = () =>
     queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
 
-  const username = currentUser?.username || null;
+  const username = currentUser?.username || currentUser?.data?.username || null;
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
