@@ -158,12 +158,18 @@ export default function Home() {
             >
               <button
                 onClick={async () => {
-                  const id = todayEntry?.id || entryIdRef.current;
-                  if (id) {
+                  const id = entryIdRef.current ?? todayEntry?.id;
+                  if (!id) {
+                    console.warn("No entry id found, cannot validate");
+                    return;
+                  }
+                  try {
                     await base44.entities.GratitudeEntry.update(id, { is_complete: true });
                     await queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+                    if (affirmations.length > 0) setShowCarousel(true);
+                  } catch (err) {
+                    console.error("Validation failed:", err);
                   }
-                  if (affirmations.length > 0) setShowCarousel(true);
                 }}
                 className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform text-[#807AC7] bg-[#F8F0E5]"
               >

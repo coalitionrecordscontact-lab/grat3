@@ -6,10 +6,13 @@ export default function EventCard({ index, value, onSave, saved, locked }) {
   const [text, setText] = useState(value || "");
   const [isFocused, setIsFocused] = useState(false);
 
-  // Sync value from parent when it changes
+  // Sync value from parent only when not actively editing,
+  // so a re-fetch can't overwrite text the user is currently typing.
   React.useEffect(() => {
-    setText(value || "");
-  }, [value]);
+    if (!isFocused) {
+      setText(value || "");
+    }
+  }, [value, isFocused]);
 
   const numbers = ["01", "02", "03"];
 
