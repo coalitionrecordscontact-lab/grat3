@@ -14,6 +14,10 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
   const [editing, setEditing] = useState(null); // field index being edited (0,1,2)
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
+  // Track the real DB id locally so a second edit updates the same record
+  // (the parent may not have re-rendered with the new id yet).
+  const localIdRef = React.useRef(entry.id || null);
+  if (entry.id) localIdRef.current = entry.id;
 
   const events = [entry.event_1, entry.event_2, entry.event_3];
 
@@ -37,10 +41,11 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
     if (!draft.trim()) { setEditing(null); return; }
     setSaving(true);
     const field = `event_${i + 1}`;
-    if (entry.id) {
-      await base44.entities.MonthlyEntry.update(entry.id, { [field]: draft.trim() });
+    if (localIdRef.current) {
+      await base44.entities.MonthlyEntry.update(localIdRef.current, { [field]: draft.trim() });
     } else {
-      await base44.entities.MonthlyEntry.create({ month: entry.month, [field]: draft.trim() });
+      const created = await base44.entities.MonthlyEntry.create({ month: entry.month, [field]: draft.trim() });
+      localIdRef.current = created.id;
     }
     setSaving(false);
     setEditing(null);

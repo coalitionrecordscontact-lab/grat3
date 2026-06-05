@@ -26,7 +26,7 @@ export default function Home() {
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
     queryFn: () => base44.auth.me(),
-    staleTime: Infinity,
+    staleTime: 60000,
   });
 
   React.useEffect(() => {
@@ -158,10 +158,10 @@ export default function Home() {
             >
               <button
                 onClick={async () => {
-                  const id = entryIdRef.current;
+                  const id = todayEntry?.id || entryIdRef.current;
                   if (id) {
                     await base44.entities.GratitudeEntry.update(id, { is_complete: true });
-                    queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+                    await queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
                   }
                   if (affirmations.length > 0) setShowCarousel(true);
                 }}
