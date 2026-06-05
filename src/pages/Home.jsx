@@ -15,53 +15,30 @@ function getTodayString() {
 export default function Home() {
   const queryClient = useQueryClient();
   const today = getTodayString();
-  const [affirmations, setAffirmations] = React.useState([]);
   const [showCarousel, setShowCarousel] = React.useState(false);
-  // Use a ref for entryId so it's always up-to-date synchronously inside mutationFn
   const entryIdRef = React.useRef(null);
-  // Holds the in-flight create promise to prevent concurrent duplicate creates
   const createPromiseRef = React.useRef(null);
 
-  // Single source of truth for current user
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
     queryFn: () => base44.auth.me(),
-    staleTime: 60000,
+    staleTime: 5000,
   });
-
-  React.useEffect(() => {
-    if (currentUser) {
-      console.log("=== currentUser ===", JSON.stringify(currentUser, null, 2));
-    }
-  }, [currentUser]);
-
-  React.useEffect(() => {
-    if (!currentUser) return;
-    setAffirmations([currentUser.affirmation_1, currentUser.affirmation_2, currentUser.affirmation_3].filter(Boolean));
-  }, [currentUser]);
 
   const { data: entries, isLoading } = useQuery({
     queryKey: ["gratitude", today, currentUser?.id],
     enabled: !!currentUser?.id,
-    queryFn: async () => {
-      return base44.entities.GratitudeEntry.filter(
-        { date: today, created_by_id: currentUser.id },
-        "-created_date",
-        1
-      );
-    },
+    queryFn: () => base44.entities.GratitudeEntry.filter(
+      { date: today, created_by_id: currentUser.id },
+      "-created_date",
+      1
+    ),
     initialData: [],
-    staleTime: 30000,
+    staleTime: 10000,
   });
 
   const todayEntry = Array.isArray(entries) && entries.length > 0 ? entries[0] : null;
 
-  React.useEffect(() => {
-    console.log("=== todayEntry ===", JSON.stringify(todayEntry, null, 2));
-    console.log("=== entryIdRef ===", entryIdRef.current);
-  }, [todayEntry]);
-
-  // Sync entryIdRef from DB entry whenever it changes
   if (todayEntry?.id) {
     entryIdRef.current = todayEntry.id;
   }
@@ -71,16 +48,14 @@ export default function Home() {
 
   const saveMutation = useMutation({
     mutationFn: async ({ field, value }) => {
-      // Already have an entry → just update
       if (entryIdRef.current) {
         return base44.entities.GratitudeEntry.update(entryIdRef.current, { [field]: value });
       }
-      // A create is already in flight → wait for it, then update the same record
       if (createPromiseRef.current) {
         const existing = await createPromiseRef.current;
         return base44.entities.GratitudeEntry.update(existing.id, { [field]: value });
       }
-      // First write of the day → create exactly one record
+
       createPromiseRef.current = base44.entities.GratitudeEntry.create({
         date: today,
         [field]: value,
@@ -88,6 +63,7 @@ export default function Home() {
       });
       const created = await createPromiseRef.current;
       entryIdRef.current = created.id;
+      createPromiseRef.current = null;
       return created;
     },
     onMutate: async ({ field, value }) => {
@@ -113,14 +89,36 @@ export default function Home() {
   });
 
   const handleSave = (index, value) => {
-    const field = `event_${index + 1}`;
-    saveMutation.mutate({ field, value });
+    saveMutation.mutate({ field: `event_${index + 1}`, value });
   };
 
-  const handleRefresh = () =>
-    queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+  const handleValidate = async () => {
+    if (saveMutation.isPending && createPromiseRef.current) {
+      await createPromiseRef.current;
+    }
 
-  const username = currentUser?.username || currentUser?.data?.username || null;
+    const id = entryIdRef.current || todayEntry?.id;
+    if (!id) {
+      console.warn("No entry ID found to validate.");
+      return;
+    }
+
+    try {
+      await base44.entities.GratitudeEntry.update(id, { is_complete: true });
+      await queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+    
+      const affirmations = [currentUser?.affirmation_1, currentUser?.affirmation_2, currentUser?.affirmation_3].filter(Boolean);
+      if (affirmations.length > 0) {
+        setShowCarousel(true);
+      }
+    } catch (err) {
+      console.error("Failed to validate day:", err);
+    }
+  };
+
+  const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+  const username = currentUser?.username || null;
+  const affirmations = [currentUser?.affirmation_1, currentUser?.affirmation_2, currentUser?.affirmation_3].filter(Boolean);
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
@@ -168,23 +166,11 @@ export default function Home() {
               className="mt-8"
             >
               <button
-                onClick={async () => {
-                  const id = entryIdRef.current ?? todayEntry?.id;
-                  if (!id) {
-                    console.warn("No entry id found, cannot validate");
-                    return;
-                  }
-                  try {
-                    await base44.entities.GratitudeEntry.update(id, { is_complete: true });
-                    await queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
-                    if (affirmations.length > 0) setShowCarousel(true);
-                  } catch (err) {
-                    console.error("Validation failed:", err);
-                  }
-                }}
-                className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-transform text-[#807AC7] bg-[#F8F0E5]"
+                onClick={handleValidate}
+                disabled={saveMutation.isPending}
+                className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-all text-[#807AC7] bg-[#F8F0E5] disabled:opacity-50"
               >
-                validate
+                {saveMutation.isPending ? "Saving..." : "validate"}
               </button>
             </motion.div>
           )}

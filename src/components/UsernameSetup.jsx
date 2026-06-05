@@ -24,21 +24,24 @@ export default function UsernameSetup({ onComplete }) {
     setLoading(true);
     setError("");
 
-    // Check uniqueness via backend function
-    const res = await base44.functions.invoke("searchUserByUsername", { username: trimmed });
-    if (res.data.found) {
-      setError("This username is already taken. Try another.");
-      setLoading(false);
-      return;
-    }
+    try {
+      const res = await base44.functions.invoke("searchUserByUsername", { username: trimmed });
+      if (res.data.found) {
+        setError("This username is already taken. Try another.");
+        setLoading(false);
+        return;
+      }
 
-    await base44.auth.updateMe({ username: trimmed });
-    const updated = await base44.auth.me();
-    console.log("=== après updateMe ===", JSON.stringify(updated, null, 2));
-    await queryClient.invalidateQueries({ queryKey: ["current-user"] });
-    await queryClient.refetchQueries({ queryKey: ["current-user"] });
-    setLoading(false);
-    onComplete(trimmed);
+      await base44.auth.updateMe({ username: trimmed });
+      await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+      await queryClient.refetchQueries({ queryKey: ["current-user"] });
+
+      setLoading(false);
+      onComplete(trimmed);
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,8 +65,7 @@ export default function UsernameSetup({ onComplete }) {
             onChange={(e) => { setUsername(e.target.value); setError(""); }}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             placeholder="e.g. sunshine_42"
-            className="w-full bg-transparent text-[#B7A08C] placeholder-[#B7A08C]/40 
-                       text-base font-body outline-none border-b border-[#B7A08C]/20 pb-2 mb-4"
+            className="w-full bg-transparent text-[#B7A08C] placeholder-[#B7A08C]/40 text-base font-body outline-none border-b border-[#B7A08C]/20 pb-2 mb-4"
             autoFocus
           />
           {error && (
@@ -72,8 +74,7 @@ export default function UsernameSetup({ onComplete }) {
           <button
             onClick={handleSubmit}
             disabled={loading || !username.trim()}
-            className="w-full bg-[#727AD0] text-[#F9EFE4] rounded-2xl py-4 text-sm font-semibold font-body 
-                       hover:bg-[#1A215B] transition-colors disabled:opacity-50 flex items-center justify-center"
+            className="w-full bg-[#727AD0] text-[#F9EFE4] rounded-2xl py-4 text-sm font-semibold font-body hover:bg-[#1A215B] transition-colors disabled:opacity-50 flex items-center justify-center"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-[#F9EFE4]/30 border-t-[#F9EFE4] rounded-full animate-spin" />
