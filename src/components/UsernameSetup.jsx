@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { queryClientInstance } from "@/lib/query-client";
 
 export default function UsernameSetup({ onComplete }) {
-  const queryClient = useQueryClient();
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,8 +32,8 @@ export default function UsernameSetup({ onComplete }) {
       }
 
       await base44.auth.updateMe({ username: trimmed });
-      await queryClient.invalidateQueries({ queryKey: ["current-user"] });
-      await queryClient.refetchQueries({ queryKey: ["current-user"] });
+      const updated = await base44.auth.me();
+      queryClientInstance.setQueryData(["current-user"], updated);
 
       setLoading(false);
       onComplete(trimmed);

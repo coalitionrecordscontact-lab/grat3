@@ -21,20 +21,24 @@ export default function Home() {
 
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
-    queryFn: () => base44.auth.me(),
-    staleTime: 5000,
+    queryFn: async () => {
+      const me = await base44.auth.me();
+      console.log("=== currentUser RAW ===", JSON.stringify(me, null, 2));
+      return me;
+    },
+    staleTime: 60000,
   });
 
   const { data: entries, isLoading } = useQuery({
-    queryKey: ["gratitude", today, currentUser?.id],
-    enabled: !!currentUser?.id,
+    queryKey: ["gratitude", today, currentUser?.email],
+    enabled: !!currentUser?.email,
     queryFn: () => base44.entities.GratitudeEntry.filter(
-      { date: today, created_by_id: currentUser.id },
+      { date: today, created_by: currentUser.email },
       "-created_date",
       1
     ),
     initialData: [],
-    staleTime: 10000,
+    staleTime: 30000,
   });
 
   const todayEntry = Array.isArray(entries) && entries.length > 0 ? entries[0] : null;
@@ -67,9 +71,9 @@ export default function Home() {
       return created;
     },
     onMutate: async ({ field, value }) => {
-      await queryClient.cancelQueries({ queryKey: ["gratitude", today, currentUser?.id] });
-      const previous = queryClient.getQueryData(["gratitude", today, currentUser?.id]);
-      queryClient.setQueryData(["gratitude", today, currentUser?.id], (old) => {
+      await queryClient.cancelQueries({ queryKey: ["gratitude", today, currentUser?.email] });
+      const previous = queryClient.getQueryData(["gratitude", today, currentUser?.email]);
+      queryClient.setQueryData(["gratitude", today, currentUser?.email], (old) => {
         const arr = Array.isArray(old) ? old : [];
         if (arr.length > 0) {
           return [{ ...arr[0], [field]: value }];
@@ -80,11 +84,11 @@ export default function Home() {
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["gratitude", today, currentUser?.id], context.previous);
+        queryClient.setQueryData(["gratitude", today, currentUser?.email], context.previous);
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+      queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.email] });
     },
   });
 
@@ -105,7 +109,7 @@ export default function Home() {
 
     try {
       await base44.entities.GratitudeEntry.update(id, { is_complete: true });
-      await queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+      await queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.email] });
     
       const affirmations = [currentUser?.affirmation_1, currentUser?.affirmation_2, currentUser?.affirmation_3].filter(Boolean);
       if (affirmations.length > 0) {
@@ -116,7 +120,7 @@ export default function Home() {
     }
   };
 
-  const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.id] });
+  const handleRefresh = () => queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.email] });
   const username = currentUser?.username || null;
   const affirmations = [currentUser?.affirmation_1, currentUser?.affirmation_2, currentUser?.affirmation_3].filter(Boolean);
 

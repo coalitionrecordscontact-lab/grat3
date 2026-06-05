@@ -42,6 +42,7 @@ const AuthenticatedApp = () => {
       if (authed) {
         const me = await base44.auth.me();
         setUser(me);
+        queryClientInstance.setQueryData(["current-user"], me);
         if (!me.username) setNeedsUsername(true);
         else if (!me.affirmation_1) setNeedsAffirmations(true);
         // Save timezone if not set or changed
