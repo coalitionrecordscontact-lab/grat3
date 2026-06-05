@@ -33,6 +33,8 @@ export default function UsernameSetup({ onComplete }) {
     }
 
     await base44.auth.updateMe({ username: trimmed });
+    const updated = await base44.auth.me();
+    console.log("=== après updateMe ===", JSON.stringify(updated, null, 2));
     await queryClient.invalidateQueries({ queryKey: ["current-user"] });
     await queryClient.refetchQueries({ queryKey: ["current-user"] });
     setLoading(false);

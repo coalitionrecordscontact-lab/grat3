@@ -30,6 +30,12 @@ export default function Home() {
   });
 
   React.useEffect(() => {
+    if (currentUser) {
+      console.log("=== currentUser ===", JSON.stringify(currentUser, null, 2));
+    }
+  }, [currentUser]);
+
+  React.useEffect(() => {
     if (!currentUser) return;
     setAffirmations([currentUser.affirmation_1, currentUser.affirmation_2, currentUser.affirmation_3].filter(Boolean));
   }, [currentUser]);
@@ -49,6 +55,11 @@ export default function Home() {
   });
 
   const todayEntry = Array.isArray(entries) && entries.length > 0 ? entries[0] : null;
+
+  React.useEffect(() => {
+    console.log("=== todayEntry ===", JSON.stringify(todayEntry, null, 2));
+    console.log("=== entryIdRef ===", entryIdRef.current);
+  }, [todayEntry]);
 
   // Sync entryIdRef from DB entry whenever it changes
   if (todayEntry?.id) {
