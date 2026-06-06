@@ -38,8 +38,8 @@ const AuthenticatedApp = () => {
   const [needsAffirmations, setNeedsAffirmations] = React.useState(false);
 
   React.useEffect(() => {
-    base44.auth.isAuthenticated().then(async (authed) => {
-      if (authed) {
+    const loadUser = async () => {
+      try {
         const me = await base44.auth.me();
         setUser(me);
         queryClientInstance.setQueryData(["current-user"], me);
@@ -50,9 +50,14 @@ const AuthenticatedApp = () => {
         if (tz && me.timezone !== tz) {
           base44.auth.updateMe({ timezone: tz });
         }
+      } catch (error) {
+        console.warn("Initial user load failed:", error);
+      } finally {
+        setCheckingUser(false);
       }
-      setCheckingUser(false);
-    });
+    };
+
+    loadUser();
   }, []);
 
   // Show loading spinner while checking app public settings or auth
@@ -76,11 +81,20 @@ const AuthenticatedApp = () => {
   }
 
   if (needsUsername) {
-    return <UsernameSetup onComplete={(u) => { setNeedsUsername(false); setUser({ ...user, username: u }); queryClientInstance.invalidateQueries({ queryKey: ["current-user"] }); setNeedsAffirmations(true); }} />;
+    return <UsernameSetup onComplete={() => {
+      const updated = queryClientInstance.getQueryData(["current-user"]) || user;
+      setUser(updated);
+      setNeedsUsername(false);
+      if (!updated?.affirmation_1) setNeedsAffirmations(true);
+    }} />;
   }
 
   if (needsAffirmations) {
-    return <AffirmationsSetup onComplete={() => { queryClientInstance.invalidateQueries({ queryKey: ["current-user"] }); setNeedsAffirmations(false); }} />;
+    return <AffirmationsSetup onComplete={() => {
+      const updated = queryClientInstance.getQueryData(["current-user"]) || user;
+      setUser(updated);
+      setNeedsAffirmations(false);
+    }} />;
   }
 
   // Render the main app

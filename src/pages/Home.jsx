@@ -18,6 +18,7 @@ export default function Home() {
   const [showCarousel, setShowCarousel] = React.useState(false);
   const entryIdRef = React.useRef(null);
   const createPromiseRef = React.useRef(null);
+  const pendingSavesRef = React.useRef(new Set());
 
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
@@ -93,28 +94,39 @@ export default function Home() {
   });
 
   const handleSave = (index, value) => {
-    saveMutation.mutate({ field: `event_${index + 1}`, value });
+    const promise = saveMutation.mutateAsync({ field: `event_${index + 1}`, value });
+    pendingSavesRef.current.add(promise);
+    promise
+      .finally(() => pendingSavesRef.current.delete(promise))
+      .catch(() => {});
   };
 
   const handleValidate = async () => {
-    if (saveMutation.isPending && createPromiseRef.current) {
-      await createPromiseRef.current;
-    }
-
-    const id = entryIdRef.current || todayEntry?.id;
-    if (!id) {
-      console.warn("No entry ID found to validate.");
-      return;
-    }
-
     try {
+      if (pendingSavesRef.current.size > 0) {
+        await Promise.all([...pendingSavesRef.current]);
+      }
+      if (createPromiseRef.current) {
+        await createPromiseRef.current;
+      }
+
+      const id = entryIdRef.current || todayEntry?.id;
+      if (!id) {
+        console.warn("No entry ID found to validate.");
+        return;
+      }
+
       await base44.entities.GratitudeEntry.update(id, { is_complete: true });
-      await queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.email] });
-    
+      queryClient.setQueryData(["gratitude", today, currentUser?.email], (old) => {
+        const arr = Array.isArray(old) ? old : [];
+        return arr.length > 0 ? [{ ...arr[0], is_complete: true }] : arr;
+      });
+
       const affirmations = [currentUser?.affirmation_1, currentUser?.affirmation_2, currentUser?.affirmation_3].filter(Boolean);
       if (affirmations.length > 0) {
         setShowCarousel(true);
       }
+      await queryClient.invalidateQueries({ queryKey: ["gratitude", today, currentUser?.email] });
     } catch (err) {
       console.error("Failed to validate day:", err);
     }
@@ -171,10 +183,9 @@ export default function Home() {
             >
               <button
                 onClick={handleValidate}
-                disabled={saveMutation.isPending}
-                className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-all text-[#807AC7] bg-[#F8F0E5] disabled:opacity-50"
+                className="w-full font-rounded text-base rounded-2xl py-4 shadow-md active:scale-95 transition-all text-[#807AC7] bg-[#F8F0E5]"
               >
-                {saveMutation.isPending ? "Saving..." : "validate"}
+                validate
               </button>
             </motion.div>
           )}

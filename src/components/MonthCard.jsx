@@ -14,12 +14,14 @@ function formatMonthLabel(monthStr) {
 export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
   const [editing, setEditing] = useState(null);
   const [draft, setDraft] = useState("");
+  const [localEvents, setLocalEvents] = useState([entry.event_1, entry.event_2, entry.event_3]);
   const inputRef = useRef(null);
   const localIdRef = useRef(entry.id || null);
 
   useEffect(() => {
     localIdRef.current = entry.id || localIdRef.current;
-  }, [entry.id]);
+    setLocalEvents([entry.event_1, entry.event_2, entry.event_3]);
+  }, [entry.id, entry.event_1, entry.event_2, entry.event_3]);
 
   useEffect(() => {
     return () => {
@@ -27,7 +29,7 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
     };
   }, []);
 
-  const events = [entry.event_1, entry.event_2, entry.event_3];
+  const events = localEvents;
 
   const handleEdit = (i) => {
     if (!isCurrent) return;
@@ -55,6 +57,7 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
     setEditing(null);
     const value = draft.trim();
     if (!value || value === (events[i] || "")) return;
+    setLocalEvents((prev) => prev.map((event, idx) => (idx === i ? value : event)));
     saveMonthMutation.mutate({ fieldIndex: i, value });
   };
 
