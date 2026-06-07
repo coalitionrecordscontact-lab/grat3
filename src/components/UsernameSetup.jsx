@@ -36,7 +36,7 @@ export default function UsernameSetup({ onComplete }) {
       queryClientInstance.setQueryData(["current-user"], updated);
 
       setLoading(false);
-      onComplete(trimmed);
+      onComplete();
     } catch (err) {
       setError("An error occurred. Please try again.");
       setLoading(false);
