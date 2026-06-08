@@ -32,7 +32,8 @@ export default function UsernameSetup({ onComplete }) {
       }
 
       await base44.auth.updateMe({ username: trimmed });
-      const updated = await base44.auth.me();
+      const current = queryClientInstance.getQueryData(["current-user"]);
+      const updated = { ...current, username: trimmed };
       queryClientInstance.setQueryData(["current-user"], updated);
 
       setLoading(false);

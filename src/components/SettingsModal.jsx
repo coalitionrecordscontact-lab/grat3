@@ -16,7 +16,7 @@ export default function SettingsModal({ isOpen, onClose }) {
     }
     setResetting(true);
     const user = await base44.auth.me();
-    const entries = await base44.entities.GratitudeEntry.filter({ created_by: user.email });
+    const entries = await base44.entities.GratitudeEntry.filter({ created_by_id: user.id });
     await Promise.all(entries.map((e) => base44.entities.GratitudeEntry.delete(e.id)));
     const friendships = await base44.entities.Friendship.filter({ follower_email: user.email });
     await Promise.all(friendships.map((f) => base44.entities.Friendship.delete(f.id)));
@@ -33,7 +33,7 @@ export default function SettingsModal({ isOpen, onClose }) {
     }
     setDeleting(true);
     const user = await base44.auth.me();
-    const entries = await base44.entities.GratitudeEntry.filter({ created_by: user.email });
+    const entries = await base44.entities.GratitudeEntry.filter({ created_by_id: user.id });
     await Promise.all(entries.map((e) => base44.entities.GratitudeEntry.delete(e.id)));
     const friendships = await base44.entities.Friendship.filter({ follower_email: user.email });
     await Promise.all(friendships.map((f) => base44.entities.Friendship.delete(f.id)));

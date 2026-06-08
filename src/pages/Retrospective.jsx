@@ -17,7 +17,7 @@ export default function Retrospective() {
     queryFn: async () => {
       const user = await base44.auth.me();
       const all = await base44.entities.GratitudeEntry.filter(
-        { created_by: user.email },
+        { created_by_id: user.id },
         "-date",
         100
       );

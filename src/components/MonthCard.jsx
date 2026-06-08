@@ -17,11 +17,13 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
   const [localEvents, setLocalEvents] = useState([entry.event_1, entry.event_2, entry.event_3]);
   const inputRef = useRef(null);
   const localIdRef = useRef(entry.id || null);
+  const pendingLocalSaveRef = useRef(false);
 
   useEffect(() => {
     localIdRef.current = entry.id || localIdRef.current;
+    if (editing !== null || pendingLocalSaveRef.current) return;
     setLocalEvents([entry.event_1, entry.event_2, entry.event_3]);
-  }, [entry.id, entry.event_1, entry.event_2, entry.event_3]);
+  }, [entry.id, entry.event_1, entry.event_2, entry.event_3, editing]);
 
   useEffect(() => {
     return () => {
@@ -48,6 +50,7 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
       return created;
     },
     onSuccess: () => {
+      pendingLocalSaveRef.current = false;
       onUpdated();
     },
   });
@@ -57,6 +60,7 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
     setEditing(null);
     const value = draft.trim();
     if (!value || value === (events[i] || "")) return;
+    pendingLocalSaveRef.current = true;
     setLocalEvents((prev) => prev.map((event, idx) => (idx === i ? value : event)));
     saveMonthMutation.mutate({ fieldIndex: i, value });
   };
