@@ -15,14 +15,13 @@ export default function AffirmationsSetup({ onComplete }) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    const updates = {
+    await base44.auth.updateMe({
       affirmation_1: affirmations[0].trim() || "I am enough.",
       affirmation_2: affirmations[1].trim() || "I am growing every day.",
       affirmation_3: affirmations[2].trim() || "I choose joy.",
-    };
-    await base44.auth.updateMe(updates);
-    const current = queryClientInstance.getQueryData(["current-user"]);
-    queryClientInstance.setQueryData(["current-user"], { ...current, ...updates });
+    });
+    const updated = await base44.auth.me();
+    queryClientInstance.setQueryData(["current-user"], updated);
     setLoading(false);
     onComplete();
   };

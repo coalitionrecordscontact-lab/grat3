@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
     // Check if user already wrote today in their timezone
     const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(now); // YYYY-MM-DD
     const entries = await base44.asServiceRole.entities.GratitudeEntry.filter({
-      created_by_id: u.id,
+      created_by: u.email,
       date: todayStr,
     });
 

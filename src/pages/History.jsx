@@ -25,11 +25,11 @@ export default function History() {
 
   // Days data
   const { data: rawEntries, isLoading: loadingDays, refetch: refetchDays } = useQuery({
-    queryKey: ["gratitude-history", currentUser?.id],
-    enabled: !!currentUser?.id,
+    queryKey: ["gratitude-history", currentUser?.email],
+    enabled: !!currentUser?.email,
     queryFn: async () => {
       return base44.entities.GratitudeEntry.filter(
-        { created_by_id: currentUser.id },
+        { created_by: currentUser.email },
         "-date",
         200
       );
@@ -40,11 +40,11 @@ export default function History() {
 
   // Months data
   const { data: rawMonthEntries, isLoading: loadingMonths, refetch: refetchMonths } = useQuery({
-    queryKey: ["monthly-history", currentUser?.id],
-    enabled: !!currentUser?.id,
+    queryKey: ["monthly-history", currentUser?.email],
+    enabled: !!currentUser?.email,
     queryFn: async () => {
       return base44.entities.MonthlyEntry.filter(
-        { created_by_id: currentUser.id },
+        { created_by: currentUser.email },
         "-month",
         100
       );
@@ -130,7 +130,7 @@ export default function History() {
                 index={0}
                 isCurrent={true}
                 onUpdated={() => {
-                  queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.id] });
+                  queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.email] });
                 }}
               />
             )}
@@ -141,7 +141,7 @@ export default function History() {
                 index={index + 1}
                 isCurrent={false}
                 onUpdated={() => {
-                  queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.id] });
+                  queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.email] });
                 }}
               />
             ))}
