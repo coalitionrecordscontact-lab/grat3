@@ -38,7 +38,7 @@ const AuthenticatedApp = () => {
   const [needsAffirmations, setNeedsAffirmations] = React.useState(false);
 
   React.useEffect(() => {
-    const loadUser = async () => {
+    const loadUser = async (attempt = 0) => {
       try {
         const me = await base44.auth.me();
         setUser(me);
@@ -50,10 +50,15 @@ const AuthenticatedApp = () => {
         if (tz && me.timezone !== tz) {
           base44.auth.updateMe({ timezone: tz });
         }
-      } catch (error) {
-        console.warn("Initial user load failed:", error);
-      } finally {
         setCheckingUser(false);
+      } catch (error) {
+        // Cold start on native iOS: token may not be ready yet — retry before giving up
+        if (attempt < 3) {
+          setTimeout(() => loadUser(attempt + 1), 800);
+        } else {
+          console.warn("Initial user load failed:", error);
+          setCheckingUser(false);
+        }
       }
     };
 
@@ -78,6 +83,16 @@ const AuthenticatedApp = () => {
       navigateToLogin();
       return null;
     }
+  }
+
+  // Wait until the user record is fully loaded before rendering pages,
+  // so username/affirmations are always available everywhere.
+  if (checkingUser) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      </div>
+    );
   }
 
   if (needsUsername) {

@@ -17,10 +17,15 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
   const [localEvents, setLocalEvents] = useState([entry.event_1, entry.event_2, entry.event_3]);
   const inputRef = useRef(null);
   const localIdRef = useRef(entry.id || null);
+  const editingRef = useRef(null);
+  editingRef.current = editing;
 
   useEffect(() => {
     localIdRef.current = entry.id || localIdRef.current;
-    setLocalEvents([entry.event_1, entry.event_2, entry.event_3]);
+    // Never overwrite what the user is currently typing
+    if (editingRef.current === null) {
+      setLocalEvents([entry.event_1, entry.event_2, entry.event_3]);
+    }
   }, [entry.id, entry.event_1, entry.event_2, entry.event_3]);
 
   useEffect(() => {
@@ -47,8 +52,8 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
       localIdRef.current = created.id;
       return created;
     },
-    onSuccess: () => {
-      onUpdated();
+    onSuccess: (saved) => {
+      onUpdated(saved);
     },
   });
 

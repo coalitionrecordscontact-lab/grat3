@@ -22,12 +22,10 @@ export default function Home() {
 
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
-    queryFn: async () => {
-      const me = await base44.auth.me();
-      console.log("=== currentUser RAW ===", JSON.stringify(me, null, 2));
-      return me;
-    },
+    queryFn: () => base44.auth.me(),
     staleTime: 60000,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const { data: entries, isLoading } = useQuery({

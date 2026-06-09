@@ -21,7 +21,26 @@ export default function History() {
     queryKey: ["current-user"],
     queryFn: () => base44.auth.me(),
     staleTime: Infinity,
+    retry: 3,
+    retryDelay: 1000,
   });
+
+  // Merge the saved record directly into the cache instead of refetching.
+  // A refetch right after a write can return stale data and wipe the text
+  // the user just typed (the "disappearing monthly text" bug).
+  const handleMonthUpdated = (saved) => {
+    if (!saved) return;
+    queryClient.setQueryData(["monthly-history", currentUser?.email], (old) => {
+      const arr = Array.isArray(old) ? old : [];
+      const idx = arr.findIndex((e) => e.id === saved.id || e.month === saved.month);
+      if (idx >= 0) {
+        const copy = [...arr];
+        copy[idx] = { ...copy[idx], ...saved };
+        return copy;
+      }
+      return [saved, ...arr];
+    });
+  };
 
   // Days data
   const { data: rawEntries, isLoading: loadingDays, refetch: refetchDays } = useQuery({
@@ -125,24 +144,20 @@ export default function History() {
           <div className="space-y-4">
             {currentMonthEntry && (
               <MonthCard
-                key={currentMonthEntry.id || currentMonth}
+                key={currentMonth}
                 entry={currentMonthEntry}
                 index={0}
                 isCurrent={true}
-                onUpdated={() => {
-                  queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.email] });
-                }}
+                onUpdated={handleMonthUpdated}
               />
             )}
             {pastMonthEntries.map((entry, index) => (
               <MonthCard
-                key={entry.id || entry.month}
+                key={entry.month}
                 entry={entry}
                 index={index + 1}
                 isCurrent={false}
-                onUpdated={() => {
-                  queryClient.invalidateQueries({ queryKey: ["monthly-history", currentUser?.email] });
-                }}
+                onUpdated={handleMonthUpdated}
               />
             ))}
           </div>
