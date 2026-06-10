@@ -18,10 +18,26 @@ export default function EventCard({ index, value, onSave, saved, locked }) {
 
   const inputRef = React.useRef(null);
 
-  // Dismiss keyboard when component unmounts (tab change, navigation)
+  // Keep latest values accessible from the unmount cleanup
+  const textRef = React.useRef(text);
+  const valueRef = React.useRef(value);
+  const onSaveRef = React.useRef(onSave);
+  const lockedRef = React.useRef(locked);
+  textRef.current = text;
+  valueRef.current = value;
+  onSaveRef.current = onSave;
+  lockedRef.current = locked;
+
+  // Save any unsaved text to the backend BEFORE unmount (tab change, navigation),
+  // because onBlur doesn't reliably fire on iOS when the component is removed.
   React.useEffect(() => {
     return () => {
       if (inputRef.current) inputRef.current.blur();
+      if (lockedRef.current) return;
+      const t = (textRef.current || "").trim();
+      if (t && t !== (valueRef.current || "")) {
+        onSaveRef.current(t);
+      }
     };
   }, []);
 

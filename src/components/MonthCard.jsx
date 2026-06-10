@@ -28,9 +28,29 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
     }
   }, [entry.id, entry.event_1, entry.event_2, entry.event_3]);
 
+  // Keep latest values accessible from the unmount cleanup
+  const draftRef = useRef("");
+  const eventsRef = useRef(localEvents);
+  const onUpdatedRef = useRef(onUpdated);
+  draftRef.current = draft;
+  eventsRef.current = localEvents;
+  onUpdatedRef.current = onUpdated;
+
+  // Save any in-progress edit to the backend BEFORE unmount (tab change),
+  // because onBlur doesn't reliably fire on iOS when the component is removed.
   useEffect(() => {
     return () => {
       if (inputRef.current) inputRef.current.blur();
+      const i = editingRef.current;
+      if (i === null) return;
+      const value = (draftRef.current || "").trim();
+      if (!value || value === (eventsRef.current[i] || "")) return;
+      const field = `event_${i + 1}`;
+      const id = localIdRef.current;
+      const promise = id
+        ? base44.entities.MonthlyEntry.update(id, { [field]: value })
+        : base44.entities.MonthlyEntry.create({ month: entry.month, [field]: value });
+      promise.then((saved) => onUpdatedRef.current(saved)).catch(() => {});
     };
   }, []);
 

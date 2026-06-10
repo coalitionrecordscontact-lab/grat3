@@ -54,6 +54,7 @@ export default function History() {
       );
     },
     initialData: [],
+    refetchOnMount: "always",
   });
   const entries = Array.isArray(rawEntries) ? rawEntries : [];
 
@@ -69,6 +70,7 @@ export default function History() {
       );
     },
     initialData: [],
+    refetchOnMount: "always",
   });
   const monthEntries = Array.isArray(rawMonthEntries) ? rawMonthEntries : [];
 

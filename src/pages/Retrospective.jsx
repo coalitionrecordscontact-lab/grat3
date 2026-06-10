@@ -24,6 +24,7 @@ export default function Retrospective() {
       return all.filter((e) => e.date >= monthStart && e.date <= monthEnd && e.is_complete);
     },
     initialData: [],
+    refetchOnMount: "always",
   });
 
   // Collect all moments from completed entries

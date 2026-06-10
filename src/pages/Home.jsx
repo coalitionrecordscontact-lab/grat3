@@ -26,6 +26,7 @@ export default function Home() {
     staleTime: 60000,
     retry: 3,
     retryDelay: 1000,
+    refetchOnMount: "always",
   });
 
   const { data: entries, isLoading } = useQuery({
@@ -38,6 +39,7 @@ export default function Home() {
     ),
     initialData: [],
     staleTime: 30000,
+    refetchOnMount: "always",
   });
 
   const todayEntry = Array.isArray(entries) && entries.length > 0 ? entries[0] : null;

@@ -43,7 +43,8 @@ export default function Community() {
       return allEntries.filter((e) => followingEmails.includes(e.created_by));
     },
     enabled: followingEmails.length > 0,
-    initialData: []
+    initialData: [],
+    refetchOnMount: "always",
   });
 
   // Build userMap from friendships (username stored there)
