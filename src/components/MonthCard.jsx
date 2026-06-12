@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { format, parseISO } from "date-fns";
-import { useMutation } from "@tanstack/react-query";
 
 function formatMonthLabel(monthStr) {
   if (!monthStr || typeof monthStr !== "string") return "";
@@ -36,6 +35,29 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
   eventsRef.current = localEvents;
   onUpdatedRef.current = onUpdated;
 
+  // Deduplicated persistence: prevents double-saves (Enter + blur both firing)
+  // and parallel creates that produce duplicate MonthlyEntry records.
+  const persistRef = useRef({ creating: null, lastSaved: {} });
+
+  const persistField = async (i, value) => {
+    const field = `event_${i + 1}`;
+    if (persistRef.current.lastSaved[field] === value) return;
+    persistRef.current.lastSaved[field] = value;
+    let saved;
+    if (localIdRef.current) {
+      saved = await base44.entities.MonthlyEntry.update(localIdRef.current, { [field]: value });
+    } else if (persistRef.current.creating) {
+      const created = await persistRef.current.creating;
+      saved = await base44.entities.MonthlyEntry.update(created.id, { [field]: value });
+    } else {
+      persistRef.current.creating = base44.entities.MonthlyEntry.create({ month: entry.month, [field]: value });
+      saved = await persistRef.current.creating;
+      localIdRef.current = saved.id;
+      persistRef.current.creating = null;
+    }
+    onUpdatedRef.current(saved);
+  };
+
   // Save any in-progress edit to the backend BEFORE unmount (tab change),
   // because onBlur doesn't reliably fire on iOS when the component is removed.
   useEffect(() => {
@@ -45,12 +67,7 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
       if (i === null) return;
       const value = (draftRef.current || "").trim();
       if (!value || value === (eventsRef.current[i] || "")) return;
-      const field = `event_${i + 1}`;
-      const id = localIdRef.current;
-      const promise = id
-        ? base44.entities.MonthlyEntry.update(id, { [field]: value })
-        : base44.entities.MonthlyEntry.create({ month: entry.month, [field]: value });
-      promise.then((saved) => onUpdatedRef.current(saved)).catch(() => {});
+      persistField(i, value).catch(() => {});
     };
   }, []);
 
@@ -62,28 +79,12 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
     setDraft(events[i] || "");
   };
 
-  const saveMonthMutation = useMutation({
-    mutationFn: async ({ fieldIndex, value }) => {
-      const field = `event_${fieldIndex + 1}`;
-      if (localIdRef.current) {
-        return base44.entities.MonthlyEntry.update(localIdRef.current, { [field]: value });
-      }
-      const created = await base44.entities.MonthlyEntry.create({ month: entry.month, [field]: value });
-      localIdRef.current = created.id;
-      return created;
-    },
-    onSuccess: (saved) => {
-      onUpdated(saved);
-    },
-  });
-
   const handleSave = (i) => {
-    if (inputRef.current) inputRef.current.blur();
     setEditing(null);
     const value = draft.trim();
     if (!value || value === (events[i] || "")) return;
     setLocalEvents((prev) => prev.map((event, idx) => (idx === i ? value : event)));
-    saveMonthMutation.mutate({ fieldIndex: i, value });
+    persistField(i, value).catch(() => {});
   };
 
   return (
@@ -123,10 +124,9 @@ export default function MonthCard({ entry, index, isCurrent, onUpdated }) {
                 onChange={(e) => setDraft(e.target.value)}
                 onBlur={() => handleSave(i)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSave(i);
+                  if (e.key === "Enter") e.target.blur();
                   if (e.key === "Escape") setEditing(null);
                 }}
-                disabled={saveMonthMutation.isPending}
               />
             ) : (
               <button

@@ -109,6 +109,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = (shouldRedirect = true) => {
+    // Clear the persisted token so a stale session isn't restored on next launch
+    try { window.localStorage.removeItem('base44_access_token'); } catch (_) { /* ignore */ }
     setUser(null);
     setIsAuthenticated(false);
     
