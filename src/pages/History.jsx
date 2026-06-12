@@ -1,3 +1,12 @@
+import React, { useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import DayCard from "../components/DayCard";
+import MonthCard from "../components/MonthCard";
+import PullToRefresh from "../components/PullToRefresh";
+
 function getCurrentMonth() {
   return format(new Date(), "yyyy-MM");
 }
@@ -7,16 +16,7 @@ export default function History() {
   const queryClient = useQueryClient();
   const currentMonth = getCurrentMonth();
 
-  // Single source of truth fimport React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import { format } from "date-fns";
-import DayCard from "../components/DayCard";
-import MonthCard from "../components/MonthCard";
-import PullToRefresh from "../components/PullToRefresh";
-
-or current user
+  // Single source of truth for current user
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
     queryFn: () => base44.auth.me(),
