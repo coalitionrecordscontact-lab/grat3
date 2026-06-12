@@ -20,9 +20,10 @@ export default function History() {
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
     queryFn: () => base44.auth.me(),
-    staleTime: Infinity,
+    staleTime: 0,
     retry: 3,
     retryDelay: 1000,
+    refetchOnMount: "always",
   });
 
   // Merge the saved record directly into the cache instead of refetching.
@@ -70,7 +71,9 @@ export default function History() {
       );
     },
     initialData: [],
-    refetchOnMount: "always",
+    // No aggressive refetch here: a server refetch right after typing can
+    // return stale data and overwrite the optimistic cache (text disappearing).
+    staleTime: 60000,
   });
   const monthEntries = Array.isArray(rawMonthEntries) ? rawMonthEntries : [];
 

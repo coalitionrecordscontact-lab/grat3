@@ -23,7 +23,7 @@ export default function Home() {
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
     queryFn: () => base44.auth.me(),
-    staleTime: 60000,
+    staleTime: 0,
     retry: 3,
     retryDelay: 1000,
     refetchOnMount: "always",
@@ -110,7 +110,19 @@ export default function Home() {
         await createPromiseRef.current;
       }
 
-      const id = entryIdRef.current || todayEntry?.id;
+      // Don't rely on in-memory refs alone: verify against the database
+      let id = entryIdRef.current || todayEntry?.id;
+      if (!id) {
+        const fresh = await base44.entities.GratitudeEntry.filter(
+          { date: today, created_by: currentUser.email },
+          "-created_date",
+          1
+        );
+        if (Array.isArray(fresh) && fresh.length > 0) {
+          id = fresh[0].id;
+          entryIdRef.current = id;
+        }
+      }
       if (!id) {
         console.warn("No entry ID found to validate.");
         return;
