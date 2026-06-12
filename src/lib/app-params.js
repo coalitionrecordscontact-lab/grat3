@@ -22,6 +22,8 @@ const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl =
 
 	if (searchParam) {
 		memoryParams.set(storageKey, searchParam);
+		// Persist so the value survives a full PWA restart (memory is wiped on quit)
+		try { window.localStorage.setItem(storageKey, searchParam); } catch (_) { /* storage unavailable */ }
 		return searchParam;
 	}
 
@@ -30,7 +32,15 @@ const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl =
 		return defaultValue;
 	}
 
-	return memoryParams.get(storageKey) || null;
+	if (memoryParams.get(storageKey)) {
+		return memoryParams.get(storageKey);
+	}
+
+	try {
+		return window.localStorage.getItem(storageKey) || null;
+	} catch (_) {
+		return null;
+	}
 }
 
 const getAppParams = () => ({

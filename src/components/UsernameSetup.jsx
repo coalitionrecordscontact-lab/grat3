@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { queryClientInstance } from "@/lib/query-client";
+import { fetchCurrentUser } from "@/lib/current-user";
 
 export default function UsernameSetup({ onComplete }) {
   const [username, setUsername] = useState("");
@@ -32,7 +33,7 @@ export default function UsernameSetup({ onComplete }) {
       }
 
       await base44.auth.updateMe({ username: trimmed });
-      const updated = await base44.auth.me();
+      const updated = await fetchCurrentUser();
       queryClientInstance.setQueryData(["current-user"], updated);
 
       setLoading(false);

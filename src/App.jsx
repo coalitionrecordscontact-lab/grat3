@@ -15,6 +15,7 @@ import AppLayout from './components/AppLayout';
 import UsernameSetup from './components/UsernameSetup';
 import AffirmationsSetup from './components/AffirmationsSetup';
 import { base44 } from '@/api/base44Client';
+import { fetchCurrentUser } from '@/lib/current-user';
 
 // Auto dark mode based on system preference
 function ThemeProvider({ children }) {
@@ -40,7 +41,7 @@ const AuthenticatedApp = () => {
   React.useEffect(() => {
     const loadUser = async (attempt = 0) => {
       try {
-        const me = await base44.auth.me();
+        const me = await fetchCurrentUser();
         setUser(me);
         queryClientInstance.setQueryData(["current-user"], me);
         if (!me.username) setNeedsUsername(true);

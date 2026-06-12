@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { queryClientInstance } from "@/lib/query-client";
+import { fetchCurrentUser } from "@/lib/current-user";
 
 export default function AffirmationsSetup({ onComplete }) {
   const [affirmations, setAffirmations] = useState(["", "", ""]);
@@ -20,7 +21,7 @@ export default function AffirmationsSetup({ onComplete }) {
       affirmation_2: affirmations[1].trim() || "I am growing every day.",
       affirmation_3: affirmations[2].trim() || "I choose joy.",
     });
-    const updated = await base44.auth.me();
+    const updated = await fetchCurrentUser();
     queryClientInstance.setQueryData(["current-user"], updated);
     setLoading(false);
     onComplete();

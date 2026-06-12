@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import { fetchCurrentUser } from "@/lib/current-user";
 import EventCard from "../components/EventCard";
 import PullToRefresh from "../components/PullToRefresh";
 import AffirmationsCarousel from "../components/AffirmationsCarousel";
@@ -22,7 +23,7 @@ export default function Home() {
 
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
-    queryFn: () => base44.auth.me(),
+    queryFn: fetchCurrentUser,
     staleTime: 0,
     retry: 3,
     retryDelay: 1000,

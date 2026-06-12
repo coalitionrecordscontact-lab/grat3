@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import DayCard from "../components/DayCard";
 import MonthCard from "../components/MonthCard";
 import PullToRefresh from "../components/PullToRefresh";
+import { fetchCurrentUser } from "@/lib/current-user";
 
 function getCurrentMonth() {
   return format(new Date(), "yyyy-MM");
@@ -19,7 +20,7 @@ export default function History() {
   // Single source of truth for current user
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
-    queryFn: () => base44.auth.me(),
+    queryFn: fetchCurrentUser,
     staleTime: 0,
     retry: 3,
     retryDelay: 1000,
